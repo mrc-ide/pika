@@ -1,0 +1,16 @@
+Package: pika
+Title: Calculates Lag and Correlation Between Two Time Series
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Kylie",
+           family = "Ainslie",
+           role = c("aut", "cre"),
+           email = "ainslie.kylie@gmail.com",
+           comment = c(ORCID = "https://orcid.org/0000-0001-5419-7206"))
+Description: This package takes two time series as inputs and first, determines the lag for the primary 
+             time series at which the cross-correlation between the two time series is highest. Second, 
+             the rolling correlation is calculated between the lagged primary time-series and the
+             secondary time series.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
