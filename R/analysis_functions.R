@@ -73,37 +73,22 @@ cross_corr <- function(dat, date_var = NULL, grp_var, x_var, y_var, max_lag = 20
 #' @keywords pika
 #' @export
 # Determine rolling correlation between two time series ----------------------------------
-rolling_corr <- function(dat, grp_var, x_var, y_var, period = "weekly"){
-  # a little bit of data wrangling to feed into tq_transmutate_xy ------------------------
+rolling_corr <- function(dat, grp_var, x_var, y_var, n = 14){
+  # a little bit of data wrangling to feed into runCor -----------------------------------
   dat1 <- dat %>%
+    # rename column names to work inside runCor --------------------------------------------
     rename(x = {{x_var}}, y = {{y_var}}, grp = {{ grp_var }}) %>%
     filter(!is.na(x), !is.na(y)) %>%
-    group_by(grp)
+    group_by(grp) %>%
+    # determine rolling correlation between x and y ----------------------------------------
+    mutate(roll_corr = TTR::runCor(x, y, n))
 
-  # if period == "weekly", n = 7 ---------------------------------------------------------
-  if(period == "weekly"){
-    dat1 %>%
-      tq_transmute_xy(
-        x = x,
-        y = y,
-        mutate_fun = runCor,
-        n = 7,
-      col_rename = "roll_corr"
-    )
-  }
+  # rename columns back to original column names -------------------------------------------
+  name_index <- which(names(dat1) %in% c("grp", "x", "y"))
+  names(dat1)[name_index] <- c(grp_var, x_var, y_var)
 
-  # if period == "biweekly", n = 14 ------------------------------------------------------
-  if(period == "biweekly"){
-    dat1 %>%
-      tq_transmute_xy(
-        x = x,
-        y = y,
-        mutate_fun = runCor,
-        n = 14,
-        col_rename = "roll_corr"
-      )
-  }
-
+  # output ---------------------------------------------------------------------------------
+  return(dat1)
 }
 
 
