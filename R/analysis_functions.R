@@ -1,6 +1,6 @@
+# Functions to perform correlation analysis of two time series
 
-#'
-#'
+
 #' This function determines lag at which the cross correlation is highest
 #' @param dat data frame with columns that correspond to two time series and grouping variable(s)
 #' @param grp_var character string of column names in dat to be used as grouping variable(s)
@@ -10,13 +10,12 @@
 #' @return tibble of lags by grp_var
 #' @keywords pika
 #' @export
-
 # Determine cross correlation and max lag between time series ---------------------------
-cross_corr <- function(dat, grp_var, x, y, max_lag = 20){
+cross_corr <- function(dat, grp_var, x_var, y_var, max_lag = 20){
   # calculate cross correlation for different lags --------------------------------------
   rhos <- dat %>%
     tidyr::nest(gg = -c(grp_var)) %>%
-    mutate_at("gg",purrr::map, function(x) ccf(x$x, x$y, lag.max = max_lag))
+    mutate_at("gg",purrr::map, function(x) ccf(x$x_var, x$y_var, lag.max = max_lag))
 
   # determine lags with max cross correlation -------------------------------------------
   lags_max <- numeric(nrow(rhos)) # empty vector for max lag values by grp_var
@@ -41,60 +40,48 @@ cross_corr <- function(dat, grp_var, x, y, max_lag = 20){
 }
 
 
+#' This function splits the time series to lag the primary without impacting the date of the secondary
+#' @param dat data frame with columns that correspond to two time series and grouping variable(s)
+#' @param grp_var character string of column names in dat to be used as grouping variable(s)
+#' @param x primary time series (should be a column in dat)
+#' @param y secondary time series (should be a column in dat)
+#' @param max_lag integer value of the maximum number of lags to perform corss correlation for
+#' @return tibble of lags by grp_var
+#' @keywords pika
+#' @export
+create_lag_date <- function(dat_x, dat_y, date_var, x_var, y_var, grp_var, my_lag){
+# lag the date variable -----------------------------------------------------------------
+dat1 <- dat_x %>%
+  mutate({{date_end}} = {{date_end}} + my_lag)
 
-# create date_lag variable
-data_phec2 <- data_phec %>% mutate(date_end = date_end + med_lag) %>%
-  select(-avg_pp_trips, -trips_scaled)
-data_phec2 <- left_join(data_phec2, movement_region, by = c("date_end" = "date", "name" = "region",
-                                                            "journey_purpose")) %>%
-  select(date_end, name, r_mean, r_q2.5, r_q97.5, avg_pp_trips, trips_scaled, journey_purpose) %>%
-  filter(!is.na(avg_pp_trips))
-# full data
-data_full1 <- data_full %>% mutate(date_end = date_end + med_lag_full) %>%
-  select(-avg_pp_trips, -trips_scaled, -date_start)
-data_full2 <- left_join(data_full1, movement_dat2 %>%
-                          ungroup() %>%
-                          select(date, lad_code, journey_purpose, avg_pp_trips, trips_scaled),
-                        by = c("date_end" = "date", "code" = "lad_code", "journey_purpose")
-)
-
-### Determine weekly rolling correlation between R_t and movement
-
-### determine rolling weekly correlation at district (utla level)
-rolling_corr <- data_full2 %>%
-  group_by(code, name, journey_purpose) %>%
-  filter(!is.na(trips_scaled)) %>%
-  tq_transmute_xy(x          = trips_scaled,
-                  y          = r_mean,
-                  mutate_fun = runCor,
-                  n          = 7,
-                  col_rename = "roll_corr_weekly") %>%
-  mutate(date_end = as.Date(as.POSIXct(date_end, 'GMT')))
-### determine rolling weekly correlation at region (phec level)
-rolling_corr2 <- data_phec2 %>%
-  group_by(name, journey_purpose) %>%
-  tq_transmute_xy(x          = trips_scaled,
-                  y          = r_mean,
-                  mutate_fun = runCor,
-                  n          = 7,
-                  col_rename = "roll_corr_weekly") %>%
-  mutate(date_end = as.Date(as.POSIXct(date_end, 'GMT')))
+dat1 %>%
+  left_join(., dat_y, by = c(date_var, grp_var))
+}
 
 
-
-# join corr data set with movement and rt for plotting
-data_full3 <- left_join(data_full2, rolling_corr, by = c("code", "name", "date_end", "journey_purpose")) %>%
-  select(date_end, code, name, region, nation, journey_purpose, r_mean, r_q2.5, r_q97.5,
-         trips_scaled, avg_pp_trips, roll_corr_weekly)
-
-#saveRDS(data_full3, "uk_rt_move_corr.rds")
-
-data_region <- left_join(data_phec2, rolling_corr2, by = c("name", "date_end", "journey_purpose")) %>%
-  select(date_end, name,r_mean, r_q2.5, r_q97.5, journey_purpose, trips_scaled,
-         avg_pp_trips, roll_corr_weekly)
-
-#saveRDS(data_region, "uk_rt_move_corr_region.rds")
-
+#' This function calculates the rolling correlation between two time series
+#' @param dat data frame with columns that correspond to two time series and grouping variable(s)
+#' @param grp_var character string of column names in dat to be used as grouping variable(s)
+#' @param x primary time series (should be a column in dat)
+#' @param y secondary time series (should be a column in dat)
+#' @param max_lag integer value of the maximum number of lags to perform corss correlation for
+#' @return tibble of lags by grp_var
+#' @keywords pika
+#' @export
+# Determine rolling correlation between R_t and movement ---------------------------
+rolling_corr <- function(dat, grp_var, x_var, y_var, n = 7){
+  dat %>%
+    group_by({{ grp_var }}) %>%
+    # group_by(!! enquo(grp_var)) %>%
+    mutate(x = {{ x_var }}, y = {{ y_var }}) %>%
+    tq_transmute_xy(
+      x = x,
+      y = y,
+      mutate_fun = runCor,
+      n = n,
+      col_rename = "roll_corr"
+    )
+}
 
 
 
