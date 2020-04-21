@@ -12,8 +12,14 @@
 #' @export
 # Determine cross correlation and max lag between time series ---------------------------
 cross_corr <- function(dat, grp_var, x_var, y_var, max_lag = 20){
+  # check for missing values ------------------------------------------------------------
+  if(is.na(dat[,c(x_var,y_var)])){warning("There are NAs in your data set and they
+                                          will be removed before calculating the
+                                          cross correlation")}
   # calculate cross correlation for different lags --------------------------------------
   rhos <- dat %>%
+    rename(x_var = {{x_var}}, y_var = {{y_var}}) %>% # rename x_var and y_var for ccf ---
+    filter(!is.na(x_var), !is.na(y_var)) %>% # remove NA values -------------------------
     tidyr::nest(gg = -c(grp_var)) %>%
     mutate_at("gg",purrr::map, function(x) ccf(x$x_var, x$y_var, lag.max = max_lag))
 
@@ -22,16 +28,16 @@ cross_corr <- function(dat, grp_var, x_var, y_var, max_lag = 20){
   # loop through grp_var values to determine max lag for each member of grp_var ---------
   for (p in 1:nrow(rhos)){
     df <- tibble(
-      name = rhos$name[p],
+      name = rhos[p,1],
       lags = rhos$gg[[p]]$lag[,1,1],
       cc = rhos$gg[[p]]$acf[,1,1]
       ) %>%
-      filter(lags < 1) # restrict to lags less than 1
+      filter(lags < 1) # restrict to lags less than 1 -----------------------------------
     lags_max[p] <- df$lags[which(df$cc == max(df$cc))]
   }
-  #
+  # create tibble of max lag by grp_var -------------------------------------------------
   lag_df <- tibble(
-    grp = rhos$grp_var,
+    grp = rhos[,grp_var],
     lag = lags_max
     )
 
