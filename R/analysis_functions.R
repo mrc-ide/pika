@@ -4,8 +4,8 @@
 #' This function determines lag at which the cross correlation is highest
 #' @param dat data frame with columns that correspond to two time series and grouping variable(s)
 #' @param grp_var character string of column names in dat to be used as grouping variable(s)
-#' @param x primary time series (should be a column in dat)
-#' @param y secondary time series (should be a column in dat)
+#' @param x_var primary time series (should be a column in dat)
+#' @param y_var secondary time series (should be a column in dat)
 #' @param max_lag integer value of the maximum number of lags to perform corss correlation for
 #' @return tibble of lags by grp_var
 #' @keywords pika
@@ -41,12 +41,14 @@ cross_corr <- function(dat, grp_var, x_var, y_var, max_lag = 20){
 
 
 #' This function splits the time series to lag the primary without impacting the date of the secondary
-#' @param dat data frame with columns that correspond to two time series and grouping variable(s)
+#' @param dat_x data frame with at least three columns: date, x_var, grp_var
+#' @param dat_y data frame with at least three columns: date, y_var, grp_var
+#' @param date_var date variable name in dat_x and dat_y
+#' @param x_var primary time series (should be a column in dat_x)
+#' @param y_var secondary time series (should be a column in dat_y)
 #' @param grp_var character string of column names in dat to be used as grouping variable(s)
-#' @param x primary time series (should be a column in dat)
-#' @param y secondary time series (should be a column in dat)
-#' @param max_lag integer value of the maximum number of lags to perform corss correlation for
-#' @return tibble of lags by grp_var
+#' @param my_lag integer value of the lag
+#' @return data frame
 #' @keywords pika
 #' @export
 create_lag_date <- function(dat_x, dat_y, date_var, x_var, y_var, grp_var, my_lag){
@@ -62,9 +64,9 @@ dat1 %>%
 #' This function calculates the rolling correlation between two time series
 #' @param dat data frame with columns that correspond to two time series and grouping variable(s)
 #' @param grp_var character string of column names in dat to be used as grouping variable(s)
-#' @param x primary time series (should be a column in dat)
-#' @param y secondary time series (should be a column in dat)
-#' @param max_lag integer value of the maximum number of lags to perform corss correlation for
+#' @param x_var primary time series (should be a column in dat)
+#' @param y_var secondary time series (should be a column in dat)
+#' @param n the number of time points to calculate the rolling correlation for
 #' @return tibble of lags by grp_var
 #' @keywords pika
 #' @export
