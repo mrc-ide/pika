@@ -1,4 +1,4 @@
-# Functions to perform correlation analysis of two time series
+# Functions to perform correlation analysis of two time series --------------------------
 
 
 #' This function determines lag at which the cross correlation is highest
@@ -6,7 +6,7 @@
 #' @param grp_var character string of column names in dat to be used as grouping variable(s)
 #' @param x_var primary time series (should be a column in dat)
 #' @param y_var secondary time series (should be a column in dat)
-#' @param max_lag integer value of the maximum number of lags to perform corss correlation for
+#' @param max_lag integer value of the number of lags to perform cross correlation for
 #' @return tibble of lags by grp_var
 #' @keywords pika
 #' @export
