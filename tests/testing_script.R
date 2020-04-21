@@ -1,6 +1,39 @@
 # Testing Script ------------------------------------------------------------------------
+
+# Load required packages ----------------------------------------------------------------
 library(dplyr)
-# Read in data
+suppressPackageStartupMessages(library(tidyquant))
+# Load data -----------------------------------------------------------------------------
 load("data/china_rt_estimates.rda")
 load("data/exante_movement_data.rda")
 
+# Join data sets together by date and province to determine cross correlation -----------
+data_joined <- left_join(china_rt_estimates,
+                         exante_movement_data,
+                         by = c("date","province")
+                         )
+
+# Determine lag with max cross correlation between rt and movement ----------------------
+lags <- cross_corr(dat = data_joined,
+                   date_var = "date",
+                   grp_var = "province",
+                   x_var = "r_mean",
+                   y_var = "movement",
+                   max_lag = 10,
+                   subset_date = '2020-02-15'
+                  )
+
+# use median lag across groups ----------------------------------------------------------
+my_lag <- min(lags$lag)
+
+# create lag date using max lag from cross_corr() ---------------------------------------
+data_joined_lag <- china_rt_estimates %>%
+  mutate(date = date + my_lag) %>%
+  left_join(., exante_movement_data, by = c("date", "province"))
+
+# Determine rolling correlation between Rt and movement ---------------------------------
+rolling_corr(dat = data_joined_lag,
+             grp_var = "province",
+             x_var = "r_mean",
+             y_var = "movement",
+             period = "biweekly")
