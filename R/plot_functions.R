@@ -20,19 +20,20 @@
 #' @export
 plot_corr <- function(dat, date_var, grp_var, x_var, y_var, x_var_lower = NULL,
                       x_var_upper = NULL, facet_labels = NULL, legend_labels = NULL,
-                      y_max = NULL, col_values = NULL){
+                      y_max = NULL, col_values = c(brewer.pal(8, "RdPu")[8],
+                                                   brewer.pal(8, "Greens")[5],
+                                                   brewer.pal(8, "Blues")[8])){
 
-  # data wrangling for ggplot ------------------------------------------------------------
+# data wrangling for ggplot ------------------------------------------------------------
+dat1 <- dat %>%
+  rename(date = {{date_var}}, x_var = {{ x_var }}, y_var = {{ y_var }},grp = {{ grp_var }})
+
+if(!is.null(x_var_lower) && !is.null(x_var_upper)){
   dat1 <- dat %>%
     rename(date = {{date_var}}, x_var = {{ x_var }}, y_var = {{ y_var }},
-           grp = {{ grp_var }})  # rename column names to work inside ggplot2 ------------
-
-  if(!is.null(x_var_lower) && !is.null(x_var_upper)){
-    dat1 <- dat %>%
-      rename(date = {{date_var}}, x_var = {{ x_var }}, y_var = {{ y_var }},
-             x_var_lower = {{ x_var_lower }}, x_var_upper = {{ x_var_upper }},
-             grp = {{ grp_var }})  # rename column names to work inside ggplot2 ----------
-  }
+            x_var_lower = {{ x_var_lower }}, x_var_upper = {{ x_var_upper }},
+            grp = {{ grp_var }})  # rename column names to work inside ggplot2 ----------
+}
 
   # convert data to long format ----------------------------------------------------------
   dat_long <- dat1 %>%
@@ -65,9 +66,9 @@ p <- ggplot(data = dat1, aes(x = date, y = x_var)) +
     p <- p + scale_y_continuous(limits = c(-1, y_max))
   }
 # add confidence bounds ------------------------------------------------------------------
-  if (!is.null(x_var_lower) && !is.null(x_var_upper) && !is.null(col_values)){
+  if (!is.null(x_var_lower) && !is.null(x_var_upper)){
     p <- p + geom_ribbon(aes(ymin = x_var_lower, ymax = x_var_upper),
-                         fill = col_values[1], alpha = 0.1)
+                         fill = col_values[2], alpha = 0.1)
   }
 # customise legend -----------------------------------------------------------------------
   if (!is.null(col_values) && !is.null(legend_labels)){
