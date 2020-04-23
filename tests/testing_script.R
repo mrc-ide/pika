@@ -1,8 +1,14 @@
 # Testing Script ------------------------------------------------------------------------
 
 # Load required packages ----------------------------------------------------------------
-library(dplyr)
-suppressPackageStartupMessages(library(tidyquant))
+# library(dplyr)
+# library(tidyr)
+# library(TTR)
+# library(EpiEstim)
+# library(ggplot2)
+# library(scales)
+# library(RColorBrewer)
+
 # Load data -----------------------------------------------------------------------------
 load("data/china_rt_estimates.rda")
 load("data/exante_movement_data.rda")
@@ -23,7 +29,7 @@ lags <- cross_corr(dat = data_joined,
                    subset_date = '2020-02-15'
                   )
 
-# use median lag across groups ----------------------------------------------------------
+# use min lag across groups -------------------------------------------------------------
 my_lag <- min(lags$lag)
 
 # create lag date using max lag from cross_corr() ---------------------------------------
@@ -39,11 +45,18 @@ data_corr <- rolling_corr(dat = data_joined_lag,
                           n = 14)
 
 # Plot Rt, movement, and correlation ----------------------------------------------------
+my_labels <- c("beijing" = "Beijing", "guandong" = "Guangdong", "henan" = "Henan",
+               "hong_kong_sar" = "Hong Kong SAR", "hubei" = "Hubei", "hunan" = "Hunan",
+               "zhejiang" = "Zhejiang")
+my_legend = c("Correlation", "Reproduction Number", "Movement")
+
 plot_corr(dat = data_corr,
           date_var = "date",
           grp_var = "province",
           x_var = "r_mean",
           y_var = "movement",
           x_var_lower = "r_q2.5",
-          x_var_upper = "r_q97.5"
+          x_var_upper = "r_q97.5",
+          facet_labels = my_labels,
+          y_max = 10
           )
