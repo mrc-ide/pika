@@ -13,7 +13,7 @@ data_joined <- left_join(china_rt_estimates,
                          by = c("date","province")
                          )
 
-# Determine lag with max cross correlation between rt and movement ----------------------
+# Determine lag with max cross correlation between Rt and movement ----------------------
 lags <- cross_corr(dat = data_joined,
                    date_var = "date",
                    grp_var = "province",
@@ -32,8 +32,18 @@ data_joined_lag <- china_rt_estimates %>%
   left_join(., exante_movement_data, by = c("date", "province"))
 
 # Determine rolling correlation between Rt and movement ---------------------------------
-rolling_corr(dat = data_joined_lag,
-             grp_var = "province",
-             x_var = "r_mean",
-             y_var = "movement",
-             period = "biweekly")
+data_corr <- rolling_corr(dat = data_joined_lag,
+                          grp_var = "province",
+                          x_var = "r_mean",
+                          y_var = "movement",
+                          n = 14)
+
+# Plot Rt, movement, and correlation ----------------------------------------------------
+plot_corr(dat = data_corr,
+          date_var = "date",
+          grp_var = "province",
+          x_var = "r_mean",
+          y_var = "movement",
+          x_var_lower = "r_q2.5",
+          x_var_upper = "r_q97.5"
+          )
