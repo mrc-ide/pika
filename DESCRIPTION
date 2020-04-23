@@ -17,3 +17,11 @@ LazyData: true
 Suggests: 
     testthat (>= 2.1.0)
 RoxygenNote: 6.1.1
+Imports: 
+    dplyr,
+    tidyr,
+    TTR,
+    EpiEstim,
+    ggplot2,
+    scales,
+    RColorBrewer
