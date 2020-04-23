@@ -81,7 +81,8 @@ dat1 <- dat %>%
   filter(!is.na(x), !is.na(y)) %>%
   group_by(grp) %>%
   # determine rolling correlation between x and y ---------------------------------------
-  mutate(roll_corr = TTR::runCor(x, y, n))
+  mutate(roll_corr = TTR::runCor(x, y, n)) %>%
+  ungroup()
 
 # rename columns back to original column names ------------------------------------------
 name_index <- which(names(dat1) %in% c("grp", "x", "y"))
