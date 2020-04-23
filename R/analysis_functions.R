@@ -68,29 +68,81 @@ cross_corr <- function(dat, date_var = NULL, grp_var, x_var, y_var, max_lag = 20
 #' @param grp_var character string of column names in dat to be used as grouping variable(s)
 #' @param x_var primary time series (should be a column in dat)
 #' @param y_var secondary time series (should be a column in dat)
-#' @param period the time period over which to calculate rolling corr, values = c("weekly", "biweekly")
+#' @param n the number of time periods over which to calculate rolling correlation
 #' @return tibble of lags by grp_var
 #' @keywords pika
 #' @export
-# Determine rolling correlation between two time series ----------------------------------
+# Determine rolling correlation between two time series ---------------------------------
 rolling_corr <- function(dat, grp_var, x_var, y_var, n = 14){
-  # a little bit of data wrangling to feed into runCor -----------------------------------
-  dat1 <- dat %>%
-    # rename column names to work inside runCor --------------------------------------------
-    rename(x = {{x_var}}, y = {{y_var}}, grp = {{ grp_var }}) %>%
-    filter(!is.na(x), !is.na(y)) %>%
-    group_by(grp) %>%
-    # determine rolling correlation between x and y ----------------------------------------
-    mutate(roll_corr = TTR::runCor(x, y, n))
+# a little bit of data wrangling to feed into runCor ------------------------------------
+dat1 <- dat %>%
+  # rename column names to work inside runCor -------------------------------------------
+  rename(x = {{x_var}}, y = {{y_var}}, grp = {{ grp_var }}) %>%
+  filter(!is.na(x), !is.na(y)) %>%
+  group_by(grp) %>%
+  # determine rolling correlation between x and y ---------------------------------------
+  mutate(roll_corr = TTR::runCor(x, y, n))
 
-  # rename columns back to original column names -------------------------------------------
-  name_index <- which(names(dat1) %in% c("grp", "x", "y"))
-  names(dat1)[name_index] <- c(grp_var, x_var, y_var)
+# rename columns back to original column names ------------------------------------------
+name_index <- which(names(dat1) %in% c("grp", "x", "y"))
+names(dat1)[name_index] <- c(grp_var, x_var, y_var)
 
-  # output ---------------------------------------------------------------------------------
-  return(dat1)
+# output --------------------------------------------------------------------------------
+return(dat1)
 }
 
 
+#' This function estimates reproduction number by group using EpiEstim's estimate_R() and
+#' then binds the results together into a single data frame
+#' @param dat data frame with columns that correspond to two time series and grouping variable(s)
+#' @param grp_var character string of column names in dat to be used as grouping variable(s)
+#' @param date_var primary time series (should be a column in dat)
+#' @param incidence_var secondary time series (should be a column in dat)
+#' @param est_method estimation method to be used to estimate R in EpiEstim:
+#' c("non_parametric_si","parametric_si","uncertain_si","si_from_data","si_from_sample")
+#' @param si_mean mean of serial interval distribution to be specified when
+#' est_method = "parametric_si"
+#' @param si_std standard deviation of serial interval distribution to be specified when
+#' est_method = "parametric_si"
+#' @return data frame of mean, median, and 95% credible interval reproduction number
+#' @keywords pika
+#' @export
+# Estimate R_t with EpiEstim by grp_var -----------------------------------------------------
+estimate_rt <- function(dat, grp_var, date_var, incidence_var, est_method = "parametric_si",
+                        si_mean = 6.48, si_std = 3.83){
+# estimate Rt by group-----------------------------------------------------------------------
+r <- dat %>%
+  # rename column names to work inside EpiEstim ---------------------------------------------
+  rename(dates = {{date_var}}, I = {{incidence_var}}, grp = {{ grp_var }}) %>%
+  # group by grp
+  tidyr::nest(gg = -"grp") %>%
+  mutate_at("gg", purrr::map,function(x) estimate_R(x, method=est_method,
+                                                    config = make_config(list(mean_si = si_mean,
+                                                                              std_si = si_std)))
+  )
+# loop through groups to extract R estimates ------------------------------------------------
+R_t <- list()
+for(i in 1:length(r$grp)){
+  R_t[[i]] <- r$gg[[i]]$R %>%
+    mutate(grp = r$grp[i],
+           date_start = r$gg[[i]]$dates[t_start],
+           date_end = r$gg[[i]]$dates[t_start][t_end]) %>%
+    rename(r_mean = `Mean(R)`, r_q2.5 = `Quantile.0.025(R)`,
+           r_q97.5 = `Quantile.0.975(R)`,
+           r_median = `Median(R)`) %>%
+    select(date_start, date_end, grp, r_mean, r_q2.5,
+           r_q97.5, r_median)
+}
+
+# bind rows to create single data frame -----------------------------------------------------
+r_dat <- bind_rows(R_t)
+
+# rename columns back to original column names ----------------------------------------------
+name_index <- which(names(r_dat) == "grp")
+names(r_dat)[name_index] <- grp_var
+
+# output ------------------------------------------------------------------------------------
+return(r_dat)
+}
 
 
