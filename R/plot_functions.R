@@ -33,7 +33,13 @@ if(!is.null(x_var_lower) && !is.null(x_var_upper)){
     rename(date = {{date_var}}, x_var = {{ x_var }}, y_var = {{ y_var }},
             x_var_lower = {{ x_var_lower }}, x_var_upper = {{ x_var_upper }},
             grp = {{ grp_var }})  # rename column names to work inside ggplot2 ----------
+  if (!is.null(y_max)){
+    dat1 <- dat1 %>%
+      mutate(x_var_lower = ifelse(x_var_lower > y_max, y_max, x_var_lower),
+             x_var_upper = ifelse(x_var_upper > y_max, y_max, x_var_upper))
+  }
 }
+
 
   # convert data to long format ----------------------------------------------------------
   dat_long <- dat1 %>%
@@ -73,7 +79,7 @@ p <- ggplot(data = dat1, aes(x = date, y = x_var)) +
 # customise legend -----------------------------------------------------------------------
   if (!is.null(col_values) && !is.null(legend_labels)){
     p <- p + scale_color_manual(values = col_values, name = "",
-                                breaks = c("x_var", "y_var", "roll_corr"),
+                                breaks = c("roll_corr", "x_var", "y_var"),
                                 labels = legend_labels)
   }
   return(p)
