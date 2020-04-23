@@ -58,5 +58,6 @@ plot_corr(dat = data_corr,
           x_var_lower = "r_q2.5",
           x_var_upper = "r_q97.5",
           facet_labels = my_labels,
+          legend_labels = my_legend,
           y_max = 10
           )
