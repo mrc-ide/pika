@@ -12,8 +12,18 @@
 # Load data -----------------------------------------------------------------------------
 load("data/china_rt_estimates.rda")
 load("data/exante_movement_data.rda")
+load("data/china_case_data.rda")
+
+# user can either read in rt estimates directly or estimate them with pika --------------
+# to estimate them with pik, use estimate_rt() ------------------------------------------
+pika_rt_estimates <- estimate_rt(dat = china_case_data,
+                                 grp_var = "province",
+                                 date_var = "date",
+                                 incidence_var = "cases"
+                                 )
 
 # Join data sets together by date and province to determine cross correlation -----------
+# for this we are using input rt estimates, not those estimated using pika::estimate_rt()
 data_joined <- left_join(china_rt_estimates,
                          exante_movement_data,
                          by = c("date","province")
@@ -61,3 +71,5 @@ plot_corr(dat = data_corr,
           legend_labels = my_legend,
           y_max = 10
           )
+
+
