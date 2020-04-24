@@ -111,6 +111,10 @@ return(dat1)
 # Estimate R_t with EpiEstim by grp_var -----------------------------------------------------
 estimate_rt <- function(dat, grp_var, date_var, incidence_var, est_method = "parametric_si",
                         si_mean = 6.48, si_std = 3.83){
+# check for NAs -----------------------------------------------------------------------------
+  if(nrow(china_case_data[which(is.na(china_case_data$cases)),]) > 0){
+    stop("NAs are present in your data set, please remove them before estimating Rt.")
+  }
 # estimate Rt by group-----------------------------------------------------------------------
 r <- dat %>%
   # rename column names to work inside EpiEstim ---------------------------------------------
