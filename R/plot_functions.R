@@ -18,6 +18,7 @@
 #' @return tibble of lags by grp_var
 #' @keywords pika
 #' @import RColorBrewer
+#' @import ggplot2
 #' @export
 plot_corr <- function(dat, date_var, grp_var, x_var, y_var, x_var_lower = NULL,
                       x_var_upper = NULL, facet_labels = NULL, legend_labels = NULL,

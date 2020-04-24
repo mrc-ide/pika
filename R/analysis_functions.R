@@ -72,6 +72,7 @@ cross_corr <- function(dat, date_var = NULL, grp_var, x_var, y_var, max_lag = 20
 #' @param n the number of time periods over which to calculate rolling correlation
 #' @return tibble of lags by grp_var
 #' @keywords pika
+#' @import TTR
 #' @export
 # Determine rolling correlation between two time series ---------------------------------
 rolling_corr <- function(dat, grp_var, x_var, y_var, n = 14){
