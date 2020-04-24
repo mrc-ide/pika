@@ -6,9 +6,20 @@
 There are optional arguments for confidence bands on x_var and customisation of the
 maximum value of the y-axis and labels for the facets of grp_var}
 \usage{
-plot_corr(dat, date_var, grp_var, x_var, y_var, x_var_lower = NULL,
-  x_var_upper = NULL, facet_labels = NULL, legend_labels = NULL,
-  y_max = NULL, col_values = NULL)
+plot_corr(
+  dat,
+  date_var,
+  grp_var,
+  x_var,
+  y_var,
+  x_var_lower = NULL,
+  x_var_upper = NULL,
+  facet_labels = NULL,
+  legend_labels = NULL,
+  y_max = NULL,
+  col_values = c(brewer.pal(8, "RdPu")[8], brewer.pal(8, "Greens")[5], brewer.pal(8,
+    "Blues")[8])
+)
 }
 \arguments{
 \item{dat}{data frame with columns that correspond to two time series and grouping variable(s)}

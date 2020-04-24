@@ -12,6 +12,7 @@
 #' @param subset_date a character string of the same format as the date variable
 #' @return tibble of lags by grp_var
 #' @keywords pika
+#' @import dplyr
 #' @export
 # Determine cross correlation and max lag between time series ---------------------------
 cross_corr <- function(dat, date_var = NULL, grp_var, x_var, y_var, max_lag = 20,
@@ -30,25 +31,25 @@ cross_corr <- function(dat, date_var = NULL, grp_var, x_var, y_var, max_lag = 20
   # subset data by subset_date if subset_date is not NULL -------------------------------
   if (!is.null(subset_date)){
     dat <- dat[ dat[, date_var] <= subset_date, ]
-   }
+  }
 
   # calculate cross correlation for different lags --------------------------------------
   rhos <- dat %>%
     rename(x_var = {{x_var}}, y_var = {{y_var}}) %>% # rename x_var and y_var for ccf ---
     filter(!is.na(x_var), !is.na(y_var)) %>% # remove NA values -------------------------
-    tidyr::nest(gg = -c(grp_var)) %>%
+  tidyr::nest(gg = -c(grp_var)) %>%
     mutate_at("gg",purrr::map, function(x) ccf(x$x_var, x$y_var, lag.max = max_lag))
 
   # determine lags with max cross correlation -------------------------------------------
   lags_max <- numeric(nrow(rhos)) # empty vector for max lag values by grp_var ----------
 
   for (p in 1:nrow(rhos)){ # loop through grp_var values to determine max lag for each --
-                           # member of grp_var ------------------------------------------
+    # member of grp_var ------------------------------------------
     df <- tibble(
       name = rhos[p,1],
       lags = rhos$gg[[p]]$lag[,1,1],
       cc = rhos$gg[[p]]$acf[,1,1]
-      ) %>%
+    ) %>%
       filter(lags < 1) # restrict to lags less than 1 -----------------------------------
     lags_max[p] <- df$lags[which(df$cc == max(df$cc))]
   }
@@ -56,7 +57,7 @@ cross_corr <- function(dat, date_var = NULL, grp_var, x_var, y_var, max_lag = 20
   lag_df <- tibble(
     grp = rhos[,grp_var],
     lag = lags_max
-    )
+  )
 
   # output ------------------------------------------------------------------------------
   return(lag_df)
@@ -74,22 +75,22 @@ cross_corr <- function(dat, date_var = NULL, grp_var, x_var, y_var, max_lag = 20
 #' @export
 # Determine rolling correlation between two time series ---------------------------------
 rolling_corr <- function(dat, grp_var, x_var, y_var, n = 14){
-# a little bit of data wrangling to feed into runCor ------------------------------------
-dat1 <- dat %>%
-  # rename column names to work inside runCor -------------------------------------------
+  # a little bit of data wrangling to feed into runCor ------------------------------------
+  dat1 <- dat %>%
+    # rename column names to work inside runCor -------------------------------------------
   rename(x = {{x_var}}, y = {{y_var}}, grp = {{ grp_var }}) %>%
-  filter(!is.na(x), !is.na(y)) %>%
-  group_by(grp) %>%
-  # determine rolling correlation between x and y ---------------------------------------
+    filter(!is.na(x), !is.na(y)) %>%
+    group_by(grp) %>%
+    # determine rolling correlation between x and y ---------------------------------------
   mutate(roll_corr = TTR::runCor(x, y, n)) %>%
-  ungroup()
+    ungroup()
 
-# rename columns back to original column names ------------------------------------------
-name_index <- which(names(dat1) %in% c("grp", "x", "y"))
-names(dat1)[name_index] <- c(grp_var, x_var, y_var)
+  # rename columns back to original column names ------------------------------------------
+  name_index <- which(names(dat1) %in% c("grp", "x", "y"))
+  names(dat1)[name_index] <- c(grp_var, x_var, y_var)
 
-# output --------------------------------------------------------------------------------
-return(dat1)
+  # output --------------------------------------------------------------------------------
+  return(dat1)
 }
 
 
@@ -110,44 +111,44 @@ return(dat1)
 #' @export
 # Estimate R_t with EpiEstim by grp_var -----------------------------------------------------
 estimate_rt <- function(dat, grp_var, date_var, incidence_var, est_method = "parametric_si",
-                        si_mean = 6.48, si_std = 3.83){
-# check for NAs -----------------------------------------------------------------------------
-  if(nrow(china_case_data[which(is.na(china_case_data$cases)),]) > 0){
+                        si_mean = 6.48, si_std = 3.83) {
+  # check for NAs -----------------------------------------------------------------------------
+  if (nrow(dat[which(is.na(dat[[incidence_var]])),]) > 0){
     stop("Error: NAs are present in your data set, please remove them before estimating Rt.")
   }
-# estimate Rt by group-----------------------------------------------------------------------
-r <- dat %>%
-  # rename column names to work inside EpiEstim ---------------------------------------------
+  # estimate Rt by group-----------------------------------------------------------------------
+  r <- dat %>%
+    # rename column names to work inside EpiEstim ---------------------------------------------
   rename(dates = {{date_var}}, I = {{incidence_var}}, grp = {{ grp_var }}) %>%
-  # group by grp
-  tidyr::nest(gg = -"grp") %>%
-  mutate_at("gg", purrr::map,function(x) estimate_R(x, method=est_method,
-                                                    config = make_config(list(mean_si = si_mean,
-                                                                              std_si = si_std)))
-  )
-# loop through groups to extract R estimates ------------------------------------------------
-R_t <- list()
-for(i in 1:length(r$grp)){
-  R_t[[i]] <- r$gg[[i]]$R %>%
-    mutate(grp = r$grp[i],
-           date_start = r$gg[[i]]$dates[t_start],
-           date_end = r$gg[[i]]$dates[t_start][t_end]) %>%
-    rename(r_mean = `Mean(R)`, r_q2.5 = `Quantile.0.025(R)`,
-           r_q97.5 = `Quantile.0.975(R)`,
-           r_median = `Median(R)`) %>%
-    select(date_start, date_end, grp, r_mean, r_q2.5,
-           r_q97.5, r_median)
-}
+    # group by grp
+    tidyr::nest(gg = -"grp") %>%
+    mutate_at("gg", purrr::map,function(x) estimate_R(x, method=est_method,
+                                                      config = make_config(list(mean_si = si_mean,
+                                                                                std_si = si_std)))
+    )
+  # loop through groups to extract R estimates ------------------------------------------------
+  R_t <- list()
+  for(i in 1:length(r$grp)){
+    R_t[[i]] <- r$gg[[i]]$R %>%
+      mutate(grp = r$grp[i],
+             date_start = r$gg[[i]]$dates[t_start],
+             date_end = r$gg[[i]]$dates[t_start][t_end]) %>%
+      rename(r_mean = `Mean(R)`, r_q2.5 = `Quantile.0.025(R)`,
+             r_q97.5 = `Quantile.0.975(R)`,
+             r_median = `Median(R)`) %>%
+      select(date_start, date_end, grp, r_mean, r_q2.5,
+             r_q97.5, r_median)
+  }
 
-# bind rows to create single data frame -----------------------------------------------------
-r_dat <- bind_rows(R_t)
+  # bind rows to create single data frame -----------------------------------------------------
+  r_dat <- bind_rows(R_t)
 
-# rename columns back to original column names ----------------------------------------------
-name_index <- which(names(r_dat) == "grp")
-names(r_dat)[name_index] <- grp_var
+  # rename columns back to original column names ----------------------------------------------
+  name_index <- which(names(r_dat) == "grp")
+  names(r_dat)[name_index] <- grp_var
 
-# output ------------------------------------------------------------------------------------
-return(r_dat)
+  # output ------------------------------------------------------------------------------------
+  return(r_dat)
 }
 
 
