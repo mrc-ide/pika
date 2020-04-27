@@ -14,7 +14,6 @@
 #' @keywords pika
 #' @import dplyr
 #' @import tidyr
-#' @importFrom("stats", "ccf")
 #' @export
 # Determine cross correlation and max lag between time series ---------------------------
 cross_corr <- function(dat, date_var = NULL, grp_var, x_var, y_var, max_lag = 20,
@@ -40,7 +39,7 @@ cross_corr <- function(dat, date_var = NULL, grp_var, x_var, y_var, max_lag = 20
     rename(x_var = {{x_var}}, y_var = {{y_var}}) %>% # rename x_var and y_var for ccf ---
     filter(!is.na(x_var), !is.na(y_var)) %>% # remove NA values -------------------------
   tidyr::nest(gg = -c(grp_var)) %>%
-    mutate_at("gg",purrr::map, function(x) ccf(x$x_var, x$y_var, lag.max = max_lag))
+    mutate_at("gg",purrr::map, function(x) stats::ccf(x$x_var, x$y_var, lag.max = max_lag))
 
   # determine lags with max cross correlation -------------------------------------------
   lags_max <- numeric(nrow(rhos)) # empty vector for max lag values by grp_var ----------
