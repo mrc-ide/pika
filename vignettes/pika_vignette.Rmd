@@ -36,20 +36,10 @@ The daily within-city movement data, used as a proxy for economic activity, is a
 ```{r load_data, echo=FALSE, message=FALSE}
 # Load required packages ----------------------------------------------------------------
 library(dplyr)
-# library(tidyr)
-# library(TTR)
-# library(EpiEstim)
-# library(ggplot2)
-# library(scales)
-# library(RColorBrewer)
 library(knitr)
+
 # Load pika -----------------------------------------------------------------------------
 library(pika)
-
-# Load data -----------------------------------------------------------------------------
-# load("data/china_rt_estimates.rda")
-# load("data/exante_movement_data.rda")
-# load("data/china_case_data.rda")
 
 ```
 
@@ -80,7 +70,7 @@ For more information on the methodology underlying `EpiEstim::estimate_R` look a
 
 ## Lag
 When determining the relationship between two time series it is sometimes of interest to determine the lag at which the correlation between the two time series is highest, we'll call this the optimal lag. To determine the optimal lag, the two time series must first be merged into a single data frame. We do this below using `dplyr`'s 'left_join()` by `date` and `province`.
-```{r djoin_data, warning=FALSE, results='hide'}
+```{r join_data, warning=FALSE}
 # Join data sets together by date and province to determine cross correlation -----------
 # for this we are using input rt estimates, not those estimated using pika::estimate_rt()
 data_joined <- left_join(china_rt_estimates,
@@ -90,7 +80,7 @@ data_joined <- left_join(china_rt_estimates,
 ```
 
 We can then identify the optimal lag by calculating the cross correlation between the two time series by the grouping variable at different lags using the `cross_corr` function. The argument `max_lag = ` specifies the maximum lag to test. In the below example it is set to 10 days. The `subset_date = ` argument allows the user to determine the cross correlation between the two time series for a subset of the time window.
-```{r, determine_lag}
+```{r, determine_lag, results='hide', fig.show='hide'}
 # # Determine lag with max cross correlation between Rt and movement ----------------------
 lags <- cross_corr(dat = data_joined,
                    date_var = "date",
@@ -98,7 +88,7 @@ lags <- cross_corr(dat = data_joined,
                    x_var = "r_mean",
                    y_var = "movement",
                    max_lag = 10,
-                   subset_date = '2020-02-15'
+                   subset_date = "2020-02-15"
                   )
 
 # use min lag across groups -------------------------------------------------------------
