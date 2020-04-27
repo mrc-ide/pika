@@ -3,12 +3,12 @@
 \docType{data}
 \name{china_rt_estimates}
 \alias{china_rt_estimates}
-\title{Example chinese rt data}
-\format{A data frame}
+\title{Daily estimates of effective reporduction number from COVID-19 case data in China}
+\format{An object of class \code{spec_tbl_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 497 rows and 5 columns.}
 \usage{
 china_rt_estimates
 }
 \description{
-Example chinese rt data
+A dataset of effective reproduction number (Rt) estimates over time in different provinces of China.
 }
 \keyword{datasets}
