@@ -36,13 +36,13 @@ The daily within-city movement data, used as a proxy for economic activity, is a
 ```{r load_data, echo=FALSE, message=FALSE}
 # Load required packages ----------------------------------------------------------------
 library(dplyr)
-library(tidyr)
-library(TTR)
-library(EpiEstim)
-library(ggplot2)
-library(scales)
-library(RColorBrewer)
-
+# library(tidyr)
+# library(TTR)
+# library(EpiEstim)
+# library(ggplot2)
+# library(scales)
+# library(RColorBrewer)
+library(knitr)
 # Load pika -----------------------------------------------------------------------------
 library(pika)
 
@@ -89,62 +89,62 @@ data_joined <- left_join(china_rt_estimates,
                          )
 ```
 
+We can then identify the optimal lag by calculating the cross correlation between the two time series by the grouping variable at different lags using the `cross_corr` function. The argument `max_lag = ` specifies the maximum lag to test. In the below example it is set to 10 days. The `subset_date = ` argument allows the user to determine the cross correlation between the two time series for a subset of the time window.
 ```{r, determine_lag}
 # # Determine lag with max cross correlation between Rt and movement ----------------------
-# lags <- cross_corr(dat = data_joined,
-#                    date_var = "date",
-#                    grp_var = "province",
-#                    x_var = "r_mean",
-#                    y_var = "movement",
-#                    max_lag = 10,
-#                    subset_date = '2020-02-15'
-#                   )
-# 
-# # use min lag across groups -------------------------------------------------------------
-# my_lag <- min(lags$lag)
+lags <- cross_corr(dat = data_joined,
+                   date_var = "date",
+                   grp_var = "province",
+                   x_var = "r_mean",
+                   y_var = "movement",
+                   max_lag = 10,
+                   subset_date = '2020-02-15'
+                  )
+
+# use min lag across groups -------------------------------------------------------------
+my_lag <- min(lags$lag)
 
 ```
 
+Once the optimal lag is determined, we must back date our Rt estimates without impacting the date of the movement variable.
 ```{r lag_var}
 # create lag date using max lag from cross_corr() ---------------------------------------
-# data_joined_lag <- china_rt_estimates %>%
-#   mutate(date = date + my_lag) %>%
-#   left_join(., exante_movement_data, by = c("date", "province"))
+data_joined_lag <- china_rt_estimates %>%
+  mutate(date = date + my_lag) %>%
+  left_join(., exante_movement_data, by = c("date", "province"))
 ```
 
 ## Rolling Correlation
+It is often of interest to determine the relationship between two time series, specifically the rolling correlation. The `rolling_corr()` function calculates the rolling correlation between two times series (`x_var` and `y_var`) over a specified time window `n = `. Here, we calculate the biweekly rolling correlation between Rt and movement. Since our data is daily estimates of Rt and movement, we set `n = 14`. If our data was monthly and we wanted to determine a 6 month rolling correlation, we would set `n = 6`. The output of `rolling_corr()` is a data frame with an additional column added to the input dataset called "rolling_corr". Depending on the value of `n`, the first `n` values of "rolling_corr" are NA.
 ```{r corr}
 # Determine rolling correlation between Rt and movement ---------------------------------
-# data_corr <- rolling_corr(dat = data_joined_lag,
-#                           grp_var = "province",
-#                           x_var = "r_mean",
-#                           y_var = "movement",
-#                           n = 14)
-
+data_corr <- rolling_corr(dat = data_joined_lag,
+                          grp_var = "province",
+                          x_var = "r_mean",
+                          y_var = "movement",
+                          n = 14)
 ```
 
-## Figures
-Plot of the 
+To visualise the rolling correlation, the results of `rolling_corr()` can be plotted using `plot_corr()`. This creates a plot of the two time series and the rolling correlation between them facetted by grouping variable. There are optional arguments to change the facet labels (`facet_lables = `), legend_labels (`legend_labels = `), add confidence bounds for the primary time series (`x_var_lower = ` and `x_var_upper = `), and set a maximum value for the y-axis (`y_max = `). The below code plots the mean Rt estimates with 95% confidence bands, movement index, and the biweekly correlation between them. We also specify custom facet and legend labels and restrict the y-axis to a maximum value of 10.
 
 ```{r, fig.height=6, fig.width=8,fig.show='hold', message=FALSE, warning=FALSE}
 # Plot Rt, movement, and correlation ----------------------------------------------------
-# my_labels <- c("beijing" = "Beijing", "guandong" = "Guangdong", "henan" = "Henan",
-#                "hong_kong_sar" = "Hong Kong SAR", "hubei" = "Hubei", "hunan" = "Hunan",
-#                "zhejiang" = "Zhejiang")
-# my_legend = c("Correlation", "Reproduction Number", "Movement")
-# 
-# plot_corr(dat = data_corr,
-#           date_var = "date",
-#           grp_var = "province",
-#           x_var = "r_mean",
-#           y_var = "movement",
-#           x_var_lower = "r_q2.5",
-#           x_var_upper = "r_q97.5",
-#           facet_labels = my_labels,
-#           legend_labels = my_legend,
-#           y_max = 10
-#           )
-# Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
+my_labels <- c("beijing" = "Beijing", "guandong" = "Guangdong", "henan" = "Henan",
+               "hong_kong_sar" = "Hong Kong SAR", "hubei" = "Hubei", "hunan" = "Hunan",
+               "zhejiang" = "Zhejiang")
+my_legend = c("Correlation", "Reproduction Number", "Movement")
+
+plot_corr(dat = data_corr,
+          date_var = "date",
+          grp_var = "province",
+          x_var = "r_mean",
+          y_var = "movement",
+          x_var_lower = "r_q2.5",
+          x_var_upper = "r_q97.5",
+          facet_labels = my_labels,
+          legend_labels = my_legend,
+          y_max = 10
+          )
 ```
 
 
