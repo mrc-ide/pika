@@ -13,6 +13,8 @@
 #' @return tibble of lags by grp_var
 #' @keywords pika
 #' @import dplyr
+#' @import tidyr
+#' @importFrom("stats", "ccf")
 #' @export
 # Determine cross correlation and max lag between time series ---------------------------
 cross_corr <- function(dat, date_var = NULL, grp_var, x_var, y_var, max_lag = 20,
@@ -109,6 +111,7 @@ rolling_corr <- function(dat, grp_var, x_var, y_var, n = 14){
 #' est_method = "parametric_si"
 #' @return data frame of mean, median, and 95% credible interval reproduction number
 #' @keywords pika
+#' @import EpiEstim
 #' @export
 # Estimate R_t with EpiEstim by grp_var -----------------------------------------------------
 estimate_rt <- function(dat, grp_var, date_var, incidence_var, est_method = "parametric_si",

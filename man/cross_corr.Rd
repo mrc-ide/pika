@@ -4,15 +4,8 @@
 \alias{cross_corr}
 \title{This function determines lag at which the cross correlation is highest}
 \usage{
-cross_corr(
-  dat,
-  date_var = NULL,
-  grp_var,
-  x_var,
-  y_var,
-  max_lag = 20,
-  subset_date = NULL
-)
+cross_corr(dat, date_var = NULL, grp_var, x_var, y_var, max_lag = 20,
+  subset_date = NULL)
 }
 \arguments{
 \item{dat}{data frame with columns that correspond to two time series and grouping variable(s)}
