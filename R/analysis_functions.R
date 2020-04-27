@@ -80,11 +80,11 @@ rolling_corr <- function(dat, grp_var, x_var, y_var, n = 14){
   # a little bit of data wrangling to feed into runCor ------------------------------------
   dat1 <- dat %>%
     # rename column names to work inside runCor -------------------------------------------
-  rename(x = {{x_var}}, y = {{y_var}}, grp = {{ grp_var }}) %>%
-    filter(!is.na(x), !is.na(y)) %>%
-    group_by(grp) %>%
+    rename(x = {{x_var}}, y = {{y_var}}, grp = {{ grp_var }}) %>%
+    filter(!is.na(.data$x), !is.na(.data$y)) %>%
+    group_by(.data$grp) %>%
     # determine rolling correlation between x and y ---------------------------------------
-  mutate(roll_corr = TTR::runCor(x, y, n)) %>%
+    mutate(roll_corr = TTR::runCor(.data$x, .data$y, n)) %>%
     ungroup()
 
   # rename columns back to original column names ------------------------------------------
@@ -134,13 +134,13 @@ estimate_rt <- function(dat, grp_var, date_var, incidence_var, est_method = "par
   for(i in 1:length(r$grp)){
     R_t[[i]] <- r$gg[[i]]$R %>%
       mutate(grp = r$grp[i],
-             date_start = r$gg[[i]]$dates[t_start],
-             date_end = r$gg[[i]]$dates[t_start][t_end]) %>%
-      rename(r_mean = `Mean(R)`, r_q2.5 = `Quantile.0.025(R)`,
-             r_q97.5 = `Quantile.0.975(R)`,
-             r_median = `Median(R)`) %>%
-      select(date_start, date_end, grp, r_mean, r_q2.5,
-             r_q97.5, r_median)
+             date_start = r$gg[[i]]$dates[.data$t_start],
+             date_end = r$gg[[i]]$dates[.data$t_start][.data$t_end]) %>%
+      rename(r_mean = .data$`Mean(R)`, r_q2.5 = .data$`Quantile.0.025(R)`,
+             r_q97.5 = .data$`Quantile.0.975(R)`,
+             r_median = .data$`Median(R)`) %>%
+      select(.data$date_start, .data$date_end, .data$grp, .data$r_mean, .data$r_q2.5,
+             .data$r_q97.5, .data$r_median)
   }
 
   # bind rows to create single data frame -----------------------------------------------------

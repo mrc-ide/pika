@@ -19,6 +19,7 @@
 #' @keywords pika
 #' @import RColorBrewer
 #' @import ggplot2
+#' @import scales
 #' @export
 plot_corr <- function(dat, date_var, grp_var, x_var, y_var, x_var_lower = NULL,
                       x_var_upper = NULL, facet_labels = NULL, legend_labels = NULL,
@@ -45,12 +46,12 @@ if(!is.null(x_var_lower) && !is.null(x_var_upper)){
 
   # convert data to long format ----------------------------------------------------------
   dat_long <- dat1 %>%
-    pivot_longer(-c(date, grp), names_to = "metric", values_to = "value") %>%
-    filter(metric %in% c("x_var","y_var", "roll_corr"))
+    pivot_longer(-c(.data$date, .data$grp), names_to = "metric", values_to = "value") %>%
+    filter(.data$metric %in% c("x_var","y_var", "roll_corr"))
 
 ### Plot correlation, Rt, and movement by region
 p <- ggplot(data = dat1, aes(x = date, y = x_var)) +
-  geom_line(data = dat_long, aes(x = date, y = value, color = metric)) +
+  geom_line(data = dat_long, aes(x = date, y = .data$value, color = .data$metric)) +
   xlab("Date") + ylab("") +
   scale_x_date(labels = date_format("%Y-%m-%d")) +
   geom_hline(yintercept = 1, linetype="dashed", colour = "black") +

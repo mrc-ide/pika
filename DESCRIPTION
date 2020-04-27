@@ -28,5 +28,6 @@ Imports:
     ggplot2,
     purrr,
     scales,
+    stats,
     tidyr
 
