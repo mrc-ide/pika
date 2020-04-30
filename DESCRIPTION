@@ -1,5 +1,5 @@
 Package: pika
-Title: A lightweight package for evaluating correlation between time series
+Title: Evaluate Correlation Between Time Series
 Version: 0.1.0
 Authors@R: 
     person(given = "Kylie",
