@@ -1,4 +1,4 @@
-## pika <img src="inst/pika_hex.png" align="right" height="139" />
+# pika <img src="inst/pika_hex.png" align="right" height="139" />
 
 <!-- badges: start -->
 [![Travis build status](https://travis-ci.com/mrc-ide/pika.svg?branch=master)](https://travis-ci.com/mrc-ide/pika)
