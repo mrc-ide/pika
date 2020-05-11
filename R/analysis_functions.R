@@ -155,3 +155,51 @@ estimate_rt <- function(dat, grp_var, date_var, incidence_var, est_method = "par
 }
 
 
+#' This function converts a count variable over time into a percent change based on the average
+#' value in the specified baseline period. This function was written for application to
+#' mobility data, where the percent change in mobility over time relative to baseline is of
+#' interest. However, this function can be applied to any count type time series.
+#' @param dat data frame with columns that correspond to count variable and grouping variable
+#' @param grp_var character string of column name in dat to be used as grouping variable
+#' @param date_var character string of the name of the date column (should be of class "Date")
+#' @param trip_var character string of the name of the count column, such as number of trips
+#' @param n_baseline_periods Number of periods to calculate baseline average over. For example,
+#' if the time series is days, n_baseline_periods = 7 for a baseline week.
+#' @return data frame of with an additional column of the percent change relative to baseline
+#' @keywords pika
+#' @export
+# convert n_trips to % change -------------------------------------------------------------
+calc_percent_change <- function(dat, date_var, grp_var, trip_var, n_baseline_periods = 7){
+
+  dat1 <- dat %>%
+    # rename column names to work inside piping -------------------------------------------
+  rename(date = {{date_var}}, grp = {{grp_var}}, trips = {{ trip_var }}) # %>%
+  #dplyr::select(.data$date, .data$grp, .data$trips)
+
+  # define minimum date -------------------------------------------------------------------
+  start_date <- min(dat1$date)
+  # define baseline dates -----------------------------------------------------------------
+  baseline_dates <- seq(start_date, start_date + (n_baseline_days - 1), by = 1)
+
+  # mean movement for baseline days -------------------------------------------------------
+  baseline <- dat1 %>%
+    filter(.data$date %in% baseline_dates) %>%
+    group_by(.data$grp) %>%
+    summarise_at(.vars = "trips", .funs = "mean") %>%
+    rename("baseline_trips" = "trips")
+
+  # calculate percentage change in movement relative to baseline --------------------------
+  rtn <- dat1 %>%
+    left_join(., baseline, by = "grp") %>%
+    mutate(perc_change = .data$trips / baseline_trips) %>%
+    dplyr::select(-baseline_trips)
+
+
+  # rename columns back to original column names ------------------------------------------
+  name_index <- which(names(rtn) == "date"); names(rtn)[name_index] <- date_var
+  name_index <- which(names(rtn) == "grp"); names(rtn)[name_index] <- grp_var
+  name_index <- which(names(rtn) == "trips"); names(rtn)[name_index] <- trip_var
+
+  return(rtn)
+}
+
