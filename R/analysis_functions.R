@@ -179,7 +179,7 @@ calc_percent_change <- function(dat, date_var, grp_var, trip_var, n_baseline_per
   # define minimum date -------------------------------------------------------------------
   start_date <- min(dat1$date)
   # define baseline dates -----------------------------------------------------------------
-  baseline_dates <- seq(start_date, start_date + (n_baseline_days - 1), by = 1)
+  baseline_dates <- seq(start_date, start_date + (n_baseline_periods - 1), by = 1)
 
   # mean movement for baseline days -------------------------------------------------------
   baseline <- dat1 %>%
@@ -191,8 +191,8 @@ calc_percent_change <- function(dat, date_var, grp_var, trip_var, n_baseline_per
   # calculate percentage change in movement relative to baseline --------------------------
   rtn <- dat1 %>%
     left_join(., baseline, by = "grp") %>%
-    mutate(perc_change = .data$trips / baseline_trips) %>%
-    dplyr::select(-baseline_trips)
+    mutate(perc_change = .data$trips / .data$baseline_trips) %>%
+    dplyr::select(-.data$baseline_trips)
 
 
   # rename columns back to original column names ------------------------------------------
