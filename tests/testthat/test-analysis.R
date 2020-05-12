@@ -65,3 +65,37 @@ test_that("rolling_corr throws an error when date_var is not of class 'Date'",{
                )
 
 })
+
+test_that("calc_percent_change throws an error when n_baseline_periods is larger than nrow(dat)",{
+
+  # fake data
+  df <- data.frame(date = seq(as.Date("2020-01-01"), as.Date("2020-01-11"), by = "day"),
+                   grp = rep("a", 11),
+                   my_count = rpois(11, lambda = 3)
+  )
+
+  expect_error(calc_percent_change(dat = df,
+                            date_var = "date",
+                            grp_var = "grp",
+                            count_var = "my_count",
+                            n_baseline_periods = 14)
+  )
+
+})
+
+test_that("calc_percent_change throws an error when start_date is the wrong format",{
+
+  # fake data
+  df <- data.frame(date = seq(as.Date("2020-01-01"), as.Date("2020-01-11"), by = "day"),
+                   grp = rep("a", 11),
+                   my_count = rpois(11, lambda = 3)
+  )
+
+  expect_error(calc_percent_change(dat = df,
+                                   date_var = "date",
+                                   grp_var = "grp",
+                                   count_var = "my_count",
+                                   start_date = "2020-1-1")
+  )
+
+})

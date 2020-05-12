@@ -178,6 +178,16 @@ estimate_rt <- function(dat, grp_var, date_var, incidence_var, est_method = "par
 calc_percent_change <- function(dat, date_var = "date", grp_var, count_var,
                                 n_baseline_periods = 7, start_date = NULL){
 
+  # check that there are enough observations for n_baseline_periods ----------------------
+  if(n_baseline_periods > nrow(dat)){
+    stop("Number of baseline periods is larger than number of observations in the input dataset")
+  }
+
+  # chack that start_date is a valid format ----------------------------------------------
+  if(!is.null(start_date) & (start_date %in% df[,date_var]) == FALSE){
+    stop("start_date does not match any dates in input dataset")
+  }
+
   dat1 <- dat %>%
   # rename column names to work inside piping -------------------------------------------
   rename(date = {{date_var}}, grp = {{grp_var}}, counts = {{ count_var }}) # %>%
