@@ -1,6 +1,8 @@
 # Functions to perform correlation analysis of two time series --------------------------
 
 
+#' Determine cross correlation between two time series for different lags
+#'
 #' This function determines lag at which the cross correlation is highest
 #' @param dat data frame with columns that correspond to two time series and grouping variable(s)
 #' @param date_var character string of the column name that corresponds to the date variable
@@ -65,6 +67,8 @@ cross_corr <- function(dat, date_var = NULL, grp_var, x_var, y_var, max_lag = 20
 }
 
 
+#' Calculate rolling correlation between two time series by group
+#'
 #' This function calculates the rolling correlation between two time series
 #' @param dat data frame with columns that correspond to two time series and grouping variable
 #' @param date_var character string of date column name (should be of class "Date")
@@ -101,6 +105,8 @@ rolling_corr <- function(dat, date_var = "date", grp_var, x_var, y_var, n = 14){
 }
 
 
+#' Estimate reproduction over time by group
+#'
 #' This function estimates reproduction number by group using EpiEstim's estimate_R() and
 #' then binds the results together into a single data frame
 #' @param dat data frame with columns that correspond to two time series and grouping variable(s)
@@ -160,6 +166,8 @@ estimate_rt <- function(dat, grp_var, date_var, incidence_var, est_method = "par
 }
 
 
+#' Convert a count variable into percent change relative to baseline
+#'
 #' This function converts a count variable over time into a percent change based on the average
 #' value in the specified baseline period. This function was written for application to
 #' mobility data, where the percent change in mobility over time relative to baseline is of

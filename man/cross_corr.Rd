@@ -2,7 +2,7 @@
 % Please edit documentation in R/analysis_functions.R
 \name{cross_corr}
 \alias{cross_corr}
-\title{This function determines lag at which the cross correlation is highest}
+\title{Determine cross correlation between two time series for different lags}
 \usage{
 cross_corr(
   dat,

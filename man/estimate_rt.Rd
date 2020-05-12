@@ -2,8 +2,7 @@
 % Please edit documentation in R/analysis_functions.R
 \name{estimate_rt}
 \alias{estimate_rt}
-\title{This function estimates reproduction number by group using EpiEstim's estimate_R() and
-then binds the results together into a single data frame}
+\title{Estimate reproduction over time by group}
 \usage{
 estimate_rt(
   dat,

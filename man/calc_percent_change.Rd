@@ -2,10 +2,7 @@
 % Please edit documentation in R/analysis_functions.R
 \name{calc_percent_change}
 \alias{calc_percent_change}
-\title{This function converts a count variable over time into a percent change based on the average
-value in the specified baseline period. This function was written for application to
-mobility data, where the percent change in mobility over time relative to baseline is of
-interest. However, this function can be applied to any count type time series.}
+\title{Convert a count variable into percent change relative to baseline}
 \usage{
 calc_percent_change(
   dat,

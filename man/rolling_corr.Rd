@@ -2,7 +2,7 @@
 % Please edit documentation in R/analysis_functions.R
 \name{rolling_corr}
 \alias{rolling_corr}
-\title{This function calculates the rolling correlation between two time series}
+\title{Calculate rolling correlation between two time series by group}
 \usage{
 rolling_corr(dat, date_var = "date", grp_var, x_var, y_var, n = 14)
 }
