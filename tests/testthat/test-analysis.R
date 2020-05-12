@@ -9,25 +9,19 @@ test_that("estimate_rt throws errors when given invalid data", {
 
 test_that("cross_corr throws a warning when given data with NAs",{
 
-  data(china_case_data)
-  data(exante_movement_data)
+  # fake data
+  my_dates <- seq(as.Date("2020-01-01"), as.Date("2020-02-11"), by = "day")
 
-  rt_estimates <- estimate_rt(dat = china_case_data,
-                              grp_var = "province",
-                              date_var = "date",
-                              incidence_var = "cases"
-                              ) %>%
-    mutate(province = to_snake_case(province)) %>%
-    select(-date_start) %>%
-    rename("date" = "date_end")
+  df <- data.frame(date = rep(my_dates, 2),
+                   grp = c(rep("a", 42), rep("b", 42)),
+                   r_mean = c(rep(rgamma(83, shape = 4)), NA),
+                   movement = rgamma(84, shape = 5)
+  )
 
-  data_joined <- left_join(rt_estimates,
-                           exante_movement_data,
-                           by = c("date","province"))
 
-  expect_warning(cross_corr(dat = data_joined,
+  expect_warning(cross_corr(dat = df,
                             date_var = "date",
-                            grp_var = "province",
+                            grp_var = "grp",
                             x_var = "r_mean",
                             y_var = "movement"))
 
@@ -35,27 +29,19 @@ test_that("cross_corr throws a warning when given data with NAs",{
 
 test_that("cross_corr throws an error subset_data specified and date_var = NULL",{
 
-  data(china_case_data)
-  data(exante_movement_data)
+  # fake data
+  my_dates <- seq(as.Date("2020-01-01"), as.Date("2020-02-11"), by = "day")
 
-  rt_estimates <- estimate_rt(dat = china_case_data,
-                              grp_var = "province",
-                              date_var = "date",
-                              incidence_var = "cases"
-                              ) %>%
-    mutate(province = to_snake_case(province)) %>%
-    select(-date_start) %>%
-    rename("date" = "date_end")
+  df <- data.frame(date = rep(my_dates, 2),
+                   grp = c(rep("a", 42), rep("b", 42)),
+                   r_mean = rgamma(84, shape = 4),
+                   movement = rgamma(84, shape = 5)
+  )
 
-  data_joined <- left_join(rt_estimates,
-                           exante_movement_data,
-                           by = c("date","province")) %>%
-    filter(!is.na(movement))
-
-  expect_error(cross_corr(dat = data_joined,
-                          grp_var = "province",
+  expect_error(cross_corr(dat = df,
+                          grp_var = "grp",
                           x_var = "r_mean",
                           y_var = "movement",
-                          subset_date = "2020-02-15"))
+                          subset_date = "2020-02-01"))
 
 })
