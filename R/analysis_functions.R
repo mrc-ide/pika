@@ -77,7 +77,7 @@ cross_corr <- function(dat, date_var = NULL, grp_var, x_var, y_var, max_lag = 20
 #' @import TTR
 #' @export
 # Determine rolling correlation between two time series -----------------------------------
-rolling_corr <- function(dat, date_var, grp_var, x_var, y_var, n = 14){
+rolling_corr <- function(dat, date_var = "date", grp_var, x_var, y_var, n = 14){
 
   # check that date_var is of class "Date" ------------------------------------------------
   if(class(dat[,date_var]) != "Date"){stop("date_var must be of class 'Date'")}
