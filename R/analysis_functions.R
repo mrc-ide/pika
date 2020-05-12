@@ -192,8 +192,10 @@ calc_percent_change <- function(dat, date_var = "date", grp_var, count_var,
   }
 
   # chack that start_date is a valid format ----------------------------------------------
-  if(!is.null(start_date) & (start_date %in% dat[,date_var]) == FALSE){
-    stop("start_date does not match any dates in input dataset")
+  if(!is.null(start_date)){
+    if((start_date %in% dat[,date_var]) == FALSE){
+      stop("start_date does not match any dates in input dataset")
+    }
   }
 
   dat1 <- dat %>%
