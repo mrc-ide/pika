@@ -4,12 +4,14 @@
 \name{china_case_data}
 \alias{china_case_data}
 \title{Daily confirmed cases of COVID-19 in China}
-\format{A data frame with 483 rows and 3 variables:
-\describe{
+\format{
+A data frame with 483 rows and 3 variables:
+ \describe{
    \item{date}{date, in YYYY-MM-DD format}
    \item{province}{name of province/region in China where cases occured}
    \item{cases}{number of daily cases reported of COVID-19}
-}}
+}
+}
 \source{
 \url{http://2019ncov.chinacdc.cn/2019-nCoV/}
 }

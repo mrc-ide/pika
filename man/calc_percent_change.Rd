@@ -7,8 +7,14 @@ value in the specified baseline period. This function was written for applicatio
 mobility data, where the percent change in mobility over time relative to baseline is of
 interest. However, this function can be applied to any count type time series.}
 \usage{
-calc_percent_change(dat, date_var, grp_var, trip_var,
-  n_baseline_periods = 7)
+calc_percent_change(
+  dat,
+  date_var = "date",
+  grp_var,
+  count_var,
+  n_baseline_periods = 7,
+  start_date = NULL
+)
 }
 \arguments{
 \item{dat}{data frame with columns that correspond to count variable and grouping variable}
@@ -17,10 +23,12 @@ calc_percent_change(dat, date_var, grp_var, trip_var,
 
 \item{grp_var}{character string of column name in dat to be used as grouping variable}
 
-\item{trip_var}{character string of the name of the count column, such as number of trips}
+\item{count_var}{character string of the name of the count column, such as number of trips}
 
 \item{n_baseline_periods}{Number of periods to calculate baseline average over. For example,
 if the time series is days, n_baseline_periods = 7 for a baseline week.}
+
+\item{start_date}{start date of baseline period (character string)}
 }
 \value{
 data frame of with an additional column of the percent change relative to baseline
