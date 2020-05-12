@@ -170,11 +170,13 @@ estimate_rt <- function(dat, grp_var, date_var, incidence_var, est_method = "par
 #' @param count_var character string of the name of the count column, such as number of trips
 #' @param n_baseline_periods Number of periods to calculate baseline average over. For example,
 #' if the time series is days, n_baseline_periods = 7 for a baseline week.
+#' @param start_date start date of baseline period (character string)
 #' @return data frame of with an additional column of the percent change relative to baseline
 #' @keywords pika
 #' @export
 # convert counts to % change -------------------------------------------------------------
-calc_percent_change <- function(dat, date_var, grp_var, count_var, n_baseline_periods = 7){
+calc_percent_change <- function(dat, date_var = "date", grp_var, count_var,
+                                n_baseline_periods = 7, start_date = NULL){
 
   dat1 <- dat %>%
   # rename column names to work inside piping -------------------------------------------
@@ -182,7 +184,7 @@ calc_percent_change <- function(dat, date_var, grp_var, count_var, n_baseline_pe
   #dplyr::select(.data$date, .data$grp, .data$counts)
 
   # define minimum date -------------------------------------------------------------------
-  start_date <- min(dat1$date)
+  if(is.null(start_date)){start_date <- min(dat1$date)}
   # define baseline dates -----------------------------------------------------------------
   baseline_dates <- seq(start_date, start_date + (n_baseline_periods - 1), by = 1)
 
