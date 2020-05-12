@@ -66,8 +66,9 @@ cross_corr <- function(dat, date_var = NULL, grp_var, x_var, y_var, max_lag = 20
 
 
 #' This function calculates the rolling correlation between two time series
-#' @param dat data frame with columns that correspond to two time series and grouping variable(s)
-#' @param grp_var character string of column names in dat to be used as grouping variable(s)
+#' @param dat data frame with columns that correspond to two time series and grouping variable
+#' @param date_var character string of date column name (should be of class "Date")
+#' @param grp_var character string of column name in dat to be used as grouping variable
 #' @param x_var primary time series (should be a column in dat)
 #' @param y_var secondary time series (should be a column in dat)
 #' @param n the number of time periods over which to calculate rolling correlation
@@ -75,8 +76,12 @@ cross_corr <- function(dat, date_var = NULL, grp_var, x_var, y_var, max_lag = 20
 #' @keywords pika
 #' @import TTR
 #' @export
-# Determine rolling correlation between two time series ---------------------------------
-rolling_corr <- function(dat, grp_var, x_var, y_var, n = 14){
+# Determine rolling correlation between two time series -----------------------------------
+rolling_corr <- function(dat, date_var, grp_var, x_var, y_var, n = 14){
+
+  # check that date_var is of class "Date" ------------------------------------------------
+  if(class(dat[,date_var]) != "Date"){stop("date_var must be of class 'Date'")}
+
   # a little bit of data wrangling to feed into runCor ------------------------------------
   dat1 <- dat %>%
     # rename column names to work inside runCor -------------------------------------------
@@ -172,7 +177,7 @@ estimate_rt <- function(dat, grp_var, date_var, incidence_var, est_method = "par
 calc_percent_change <- function(dat, date_var, grp_var, trip_var, n_baseline_periods = 7){
 
   dat1 <- dat %>%
-    # rename column names to work inside piping -------------------------------------------
+  # rename column names to work inside piping -------------------------------------------
   rename(date = {{date_var}}, grp = {{grp_var}}, trips = {{ trip_var }}) # %>%
   #dplyr::select(.data$date, .data$grp, .data$trips)
 
@@ -183,14 +188,14 @@ calc_percent_change <- function(dat, date_var, grp_var, trip_var, n_baseline_per
 
   # mean movement for baseline days -------------------------------------------------------
   baseline <- dat1 %>%
-    filter(.data$date %in% baseline_dates) %>%
+    filter(date %in% baseline_dates) %>%
     group_by(.data$grp) %>%
     summarise_at(.vars = "trips", .funs = "mean") %>%
     rename("baseline_trips" = "trips")
 
   # calculate percentage change in movement relative to baseline --------------------------
   rtn <- dat1 %>%
-    left_join(., baseline, by = "grp") %>%
+    left_join(.data, baseline, by = "grp") %>%
     mutate(perc_change = .data$trips / .data$baseline_trips) %>%
     dplyr::select(-.data$baseline_trips)
 
