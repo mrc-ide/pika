@@ -193,14 +193,13 @@ calc_percent_change <- function(dat, date_var = "date", grp_var, count_var,
     filter(date %in% baseline_dates) %>%
     group_by(.data$grp) %>%
     summarise_at(.vars = "counts", .funs = "mean") %>%
-    rename("baseline_countss" = "counts")
+    rename("baseline_counts" = "counts")
 
   # calculate percentage change in movement relative to baseline --------------------------
-  rtn <- dat1 %>%
-    left_join(.data, baseline, by = "grp") %>%
+  dat1a <- left_join(dat1, baseline, by = "grp")
+  rtn <- dat1a %>%
     mutate(perc_change = .data$counts / .data$baseline_counts) %>%
     dplyr::select(-.data$baseline_counts)
-
 
   # rename columns back to original column names ------------------------------------------
   name_index <- which(names(rtn) == "date"); names(rtn)[name_index] <- date_var
