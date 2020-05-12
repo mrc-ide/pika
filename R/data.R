@@ -16,21 +16,6 @@
 #' @source \url{http://2019ncov.chinacdc.cn/2019-nCoV/}
 "china_case_data"
 
-#' Daily estimates of effective reproduction number from COVID-19 case data in China
-#'
-#' A dataset of effective reproduction number (Rt) estimates over time in different provinces of China.
-#'
-#' @format{ A data frame with 496 rows and 5 variables:
-#' \describe{
-#'   \item{date}{date, in YYYY-MM-DD format}
-#'   \item{province}{name of province/region in China where cases occured}
-#'   \item{r_mean}{mean effective reproduction number}
-#'   \item{r_q2.5}{lower bound of the 95% credible interval for mean effective reproduction number}
-#'   \item{r_q97.5}{upper bound of the 95% credible interval for mean effective reproduction number}
-#' }
-#' }
-"china_rt_estimates"
-
 #' Daily within-city movement data for different regions in China
 #'
 #' The daily within-city movement data, used as a proxy for economic activity, is available from 1 January to
