@@ -4,12 +4,14 @@
 \alias{rolling_corr}
 \title{This function calculates the rolling correlation between two time series}
 \usage{
-rolling_corr(dat, grp_var, x_var, y_var, n = 14)
+rolling_corr(dat, date_var = "date", grp_var, x_var, y_var, n = 14)
 }
 \arguments{
-\item{dat}{data frame with columns that correspond to two time series and grouping variable(s)}
+\item{dat}{data frame with columns that correspond to two time series and grouping variable}
 
-\item{grp_var}{character string of column names in dat to be used as grouping variable(s)}
+\item{date_var}{character string of date column name (should be of class "Date")}
+
+\item{grp_var}{character string of column name in dat to be used as grouping variable}
 
 \item{x_var}{primary time series (should be a column in dat)}
 

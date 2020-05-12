@@ -85,7 +85,7 @@ rolling_corr <- function(dat, date_var = "date", grp_var, x_var, y_var, n = 14){
   # a little bit of data wrangling to feed into runCor ------------------------------------
   dat1 <- dat %>%
     # rename column names to work inside runCor -------------------------------------------
-    rename(x = {{x_var}}, y = {{y_var}}, grp = {{ grp_var }}) %>%
+    rename(x = {{x_var}}, y = {{y_var}}, grp = {{ grp_var }}, date = {{date_var}}) %>%
     filter(!is.na(.data$x), !is.na(.data$y)) %>%
     group_by(.data$grp) %>%
     # determine rolling correlation between x and y ---------------------------------------
