@@ -116,7 +116,7 @@ perc_change_data <- calc_percent_change(dat = exante_movement_data,
                                         n_baseline_periods = 7)
 ```
 
-```{r rt_output, echo=FALSE}
+```{r perc_change_output, echo=FALSE}
 knitr::kable(head(perc_change_data, 10))
 ```
 
