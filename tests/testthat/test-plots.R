@@ -3,8 +3,18 @@ context("plots")
 test_that("Check that plot_corr produces a ggplot object", {
 
   ## Load in example data
-  data(china_rt_estimates)
+  data(china_case-data)
   data(exante_movement_data)
+
+  # estiamte Rt
+  rt_estimates <- estimate_rt(dat = china_case_data,
+                              grp_var = "province",
+                              date_var = "date",
+                              incidence_var = "cases"
+                              ) %>%
+    mutate(province = to_snake_case(province)) %>%
+    select(-date_start) %>%
+    rename("date" = "date_end")
 
   # join datasets
   data_joined <- left_join(china_rt_estimates,
