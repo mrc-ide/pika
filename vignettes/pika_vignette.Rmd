@@ -71,7 +71,7 @@ The method used to estimate Rt can be changed using the `est_method = ` argument
 For more information on the methodology underlying `EpiEstim::estimate_R` look at this [vignette](https://cran.r-project.org/web/packages/EpiEstim/vignettes/demo.html) or at `help("estimate_R")`.
 
 ## Lag
-When determining the relationship between two time series it is sometimes of interest to determine the lag at which the correlation between the two time series is highest, we'll call this the optimal lag. To determine the optimal lag, the two time series must first be merged into a single data frame. We do this below using `dplyr`'s 'left_join()` by `date` and `province`.
+When determining the relationship between two time series it is sometimes of interest to determine the lag at which the correlation between the two time series is highest, we'll call this the optimal lag. To determine the optimal lag, the two time series must first be merged into a single data frame. We do this below using `dplyr`'s `left_join()` by `date` and `province`.
 ```{r join_data, warning=FALSE}
 # Join data sets together by date and province to determine cross correlation -----------
 # for this we are using input rt estimates, not those estimated using pika::estimate_rt()
@@ -79,6 +79,10 @@ data_joined <- left_join(rt_estimates,
                          exante_movement_data,
                          by = c("date","province")
                          )
+```
+
+```{r show_data_joined, echo=FALSE}
+knitr::kable(head(data_joined, 10))
 ```
 
 We can then identify the optimal lag by calculating the cross correlation between the two time series by the grouping variable at different lags using the `cross_corr` function. The argument `max_lag = ` specifies the maximum lag to test. In the below example it is set to 10 days. The `subset_date = ` argument allows the user to determine the cross correlation between the two time series for a subset of the time window.
@@ -136,7 +140,7 @@ To visualise the rolling correlation, the results of `rolling_corr()` can be plo
 
 ```{r, fig.height=6, fig.width=8,fig.show='hold', message=FALSE, warning=FALSE}
 # Plot Rt, movement, and correlation ----------------------------------------------------
-my_labels <- c("beijing" = "Beijing", "guandong" = "Guangdong", "henan" = "Henan",
+my_labels <- c("beijing" = "Beijing", "guangdong" = "Guangdong", "henan" = "Henan",
                "hong_kong_sar" = "Hong Kong SAR", "hubei" = "Hubei", "hunan" = "Hunan",
                "zhejiang" = "Zhejiang")
 my_legend = c("Correlation", "Reproduction Number", "Movement")

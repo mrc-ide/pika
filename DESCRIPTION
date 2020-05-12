@@ -1,6 +1,6 @@
 Package: pika
-Title: Calculates Lag and Correlation Between Two Time Series
-Version: 0.0.2
+Title: Evaluate Correlation Between Time Series
+Version: 0.1.0
 Authors@R: 
     person(given = "Kylie",
            family = "Ainslie",
