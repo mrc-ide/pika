@@ -109,15 +109,15 @@ data_joined_lag <- rt_estimates %>%
 ## Percent change relative to baseline
 Sometimes, it is of interest to convert a count variable over time into a percent change based on the average value in a specified baseline period. Using `calc_percent_change()` users can specify a baseline period that will them be used to determine the percent change in their count variable time series. This function was written for application to mobility data, where the percent change in mobility over time relative to baseline is of interest. However, this function can be applied to any count type time series.
 ```{r perc_change}
-perc_change_data <- calc_percent_change(dat = exante_movement_data,
-                                        date_var = "date",
-                                        grp_var = "province", 
-                                        count_var = "movement", 
-                                        n_baseline_periods = 7)
+# perc_change_data <- calc_percent_change(dat = exante_movement_data,
+#                                         date_var = "date",
+#                                         grp_var = "province", 
+#                                         count_var = "movement", 
+#                                         n_baseline_periods = 7)
 ```
 
 ```{r perc_change_output, echo=FALSE}
-knitr::kable(head(perc_change_data, 10))
+#knitr::kable(head(perc_change_data, 10))
 ```
 
 ## Rolling correlation
