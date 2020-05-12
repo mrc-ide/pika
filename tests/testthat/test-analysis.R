@@ -9,10 +9,19 @@ test_that("estimate_rt throws errors when given invalid data", {
 
 test_that("cross_corr throws a warning when given data with NAs",{
 
-  data(china_rt_estimates)
+  data(china_case_data)
   data(exante_movement_data)
 
-  data_joined <- left_join(china_rt_estimates,
+  rt_estimates <- estimate_rt(dat = china_case_data,
+                              grp_var = "province",
+                              date_var = "date",
+                              incidence_var = "cases"
+                              ) %>%
+    mutate(province = to_snake_case(province)) %>%
+    select(-date_start) %>%
+    rename("date" = "date_end")
+
+  data_joined <- left_join(rt_estimates,
                            exante_movement_data,
                            by = c("date","province"))
 
@@ -26,10 +35,19 @@ test_that("cross_corr throws a warning when given data with NAs",{
 
 test_that("cross_corr throws an error subset_data specified and date_var = NULL",{
 
-  data(china_rt_estimates)
+  data(china_case_data)
   data(exante_movement_data)
 
-  data_joined <- left_join(china_rt_estimates,
+  rt_estimates <- estimate_rt(dat = china_case_data,
+                              grp_var = "province",
+                              date_var = "date",
+                              incidence_var = "cases"
+                              ) %>%
+    mutate(province = to_snake_case(province)) %>%
+    select(-date_start) %>%
+    rename("date" = "date_end")
+
+  data_joined <- left_join(rt_estimates,
                            exante_movement_data,
                            by = c("date","province")) %>%
     filter(!is.na(movement))
