@@ -2,11 +2,17 @@
 % Please edit documentation in R/analysis_functions.R
 \name{estimate_rt}
 \alias{estimate_rt}
-\title{This function estimates reproduction number by group using EpiEstim's estimate_R() and
-then binds the results together into a single data frame}
+\title{Estimate reproduction over time by group}
 \usage{
-estimate_rt(dat, grp_var, date_var, incidence_var,
-  est_method = "parametric_si", si_mean = 6.48, si_std = 3.83)
+estimate_rt(
+  dat,
+  grp_var,
+  date_var,
+  incidence_var,
+  est_method = "parametric_si",
+  si_mean = 6.48,
+  si_std = 3.83
+)
 }
 \arguments{
 \item{dat}{data frame with columns that correspond to two time series and grouping variable(s)}

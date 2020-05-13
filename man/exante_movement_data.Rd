@@ -4,12 +4,14 @@
 \name{exante_movement_data}
 \alias{exante_movement_data}
 \title{Daily within-city movement data for different regions in China}
-\format{A data frame with 672 rows and 3 variables:
+\format{
+A data frame with 672 rows and 3 variables:
  \describe{
    \item{date}{date, in YYYY-MM-DD format}
    \item{province}{name of province/region in China where cases occured}
    \item{movement}{daily population-weighted with-in city movement index}
-}}
+}
+}
 \usage{
 exante_movement_data
 }

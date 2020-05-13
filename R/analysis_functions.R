@@ -1,6 +1,8 @@
 # Functions to perform correlation analysis of two time series --------------------------
 
 
+#' Determine cross correlation between two time series for different lags
+#'
 #' This function determines lag at which the cross correlation is highest
 #' @param dat data frame with columns that correspond to two time series and grouping variable(s)
 #' @param date_var character string of the column name that corresponds to the date variable
@@ -65,9 +67,12 @@ cross_corr <- function(dat, date_var = NULL, grp_var, x_var, y_var, max_lag = 20
 }
 
 
+#' Calculate rolling correlation between two time series by group
+#'
 #' This function calculates the rolling correlation between two time series
-#' @param dat data frame with columns that correspond to two time series and grouping variable(s)
-#' @param grp_var character string of column names in dat to be used as grouping variable(s)
+#' @param dat data frame with columns that correspond to two time series and grouping variable
+#' @param date_var character string of date column name (should be of class "Date")
+#' @param grp_var character string of column name in dat to be used as grouping variable
 #' @param x_var primary time series (should be a column in dat)
 #' @param y_var secondary time series (should be a column in dat)
 #' @param n the number of time periods over which to calculate rolling correlation
@@ -75,12 +80,16 @@ cross_corr <- function(dat, date_var = NULL, grp_var, x_var, y_var, max_lag = 20
 #' @keywords pika
 #' @import TTR
 #' @export
-# Determine rolling correlation between two time series ---------------------------------
-rolling_corr <- function(dat, grp_var, x_var, y_var, n = 14){
+# Determine rolling correlation between two time series -----------------------------------
+rolling_corr <- function(dat, date_var = "date", grp_var, x_var, y_var, n = 14){
+
+  # check that date_var is of class "Date" ------------------------------------------------
+  if(class(dat[,date_var]) != "Date"){stop("date_var must be of class 'Date'")}
+
   # a little bit of data wrangling to feed into runCor ------------------------------------
   dat1 <- dat %>%
     # rename column names to work inside runCor -------------------------------------------
-    rename(x = {{x_var}}, y = {{y_var}}, grp = {{ grp_var }}) %>%
+    rename(x = {{x_var}}, y = {{y_var}}, grp = {{ grp_var }}, date = {{date_var}}) %>%
     filter(!is.na(.data$x), !is.na(.data$y)) %>%
     group_by(.data$grp) %>%
     # determine rolling correlation between x and y ---------------------------------------
@@ -96,6 +105,8 @@ rolling_corr <- function(dat, grp_var, x_var, y_var, n = 14){
 }
 
 
+#' Estimate reproduction over time by group
+#'
 #' This function estimates reproduction number by group using EpiEstim's estimate_R() and
 #' then binds the results together into a single data frame
 #' @param dat data frame with columns that correspond to two time series and grouping variable(s)
@@ -154,4 +165,67 @@ estimate_rt <- function(dat, grp_var, date_var, incidence_var, est_method = "par
   return(r_dat)
 }
 
+
+#' Convert a count variable into percent change relative to baseline
+#'
+#' This function converts a count variable over time into a percent change based on the average
+#' value in the specified baseline period. This function was written for application to
+#' mobility data, where the percent change in mobility over time relative to baseline is of
+#' interest. However, this function can be applied to any count type time series.
+#' @param dat data frame with columns that correspond to count variable and grouping variable
+#' @param grp_var character string of column name in dat to be used as grouping variable
+#' @param date_var character string of the name of the date column (should be of class "Date")
+#' @param count_var character string of the name of the count column, such as number of trips
+#' @param n_baseline_periods Number of periods to calculate baseline average over. For example,
+#' if the time series is days, n_baseline_periods = 7 for a baseline week.
+#' @param start_date start date of baseline period (character string)
+#' @return data frame of with an additional column of the percent change relative to baseline
+#' @keywords pika
+#' @export
+# convert counts to % change -------------------------------------------------------------
+calc_percent_change <- function(dat, date_var = "date", grp_var, count_var,
+                                n_baseline_periods = 7, start_date = NULL){
+
+  # check that there are enough observations for n_baseline_periods ----------------------
+  if(n_baseline_periods > nrow(dat)){
+    stop("Number of baseline periods is larger than number of observations in the input dataset")
+  }
+
+  # chack that start_date is a valid format ----------------------------------------------
+  if(!is.null(start_date)){
+    if((start_date %in% dat[,date_var]) == FALSE){
+      stop("start_date does not match any dates in input dataset")
+    }
+  }
+
+  dat1 <- dat %>%
+  # rename column names to work inside piping -------------------------------------------
+  rename(date = {{date_var}}, grp = {{grp_var}}, counts = {{ count_var }}) # %>%
+  #dplyr::select(.data$date, .data$grp, .data$counts)
+
+  # define minimum date -------------------------------------------------------------------
+  if(is.null(start_date)){start_date <- min(dat1$date)}
+  # define baseline dates -----------------------------------------------------------------
+  baseline_dates <- seq(start_date, start_date + (n_baseline_periods - 1), by = 1)
+
+  # mean movement for baseline days -------------------------------------------------------
+  baseline <- dat1 %>%
+    filter(date %in% baseline_dates) %>%
+    group_by(.data$grp) %>%
+    summarise_at(.vars = "counts", .funs = "mean") %>%
+    rename("baseline_counts" = "counts")
+
+  # calculate percentage change in movement relative to baseline --------------------------
+  dat1a <- left_join(dat1, baseline, by = "grp")
+  rtn <- dat1a %>%
+    mutate(perc_change = .data$counts / .data$baseline_counts) %>%
+    dplyr::select(-.data$baseline_counts)
+
+  # rename columns back to original column names ------------------------------------------
+  name_index <- which(names(rtn) == "date"); names(rtn)[name_index] <- date_var
+  name_index <- which(names(rtn) == "grp"); names(rtn)[name_index] <- grp_var
+  name_index <- which(names(rtn) == "counts"); names(rtn)[name_index] <- count_var
+
+  return(rtn)
+}
 

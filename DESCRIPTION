@@ -1,6 +1,6 @@
 Package: pika
 Title: Evaluate Correlation Between Time Series
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: 
     person(given = "Kylie",
            family = "Ainslie",
@@ -16,8 +16,9 @@ Encoding: UTF-8
 LazyData: true
 Suggests:
     knitr,
+    snakecase,
     testthat (>= 2.1.0)
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
 Depends: R (>= 3.0.0)
 VignetteBuilder: knitr
 Imports: 
@@ -30,4 +31,3 @@ Imports:
     scales,
     stats,
     tidyr
-

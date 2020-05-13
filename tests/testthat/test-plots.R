@@ -2,32 +2,22 @@ context("plots")
 
 test_that("Check that plot_corr produces a ggplot object", {
 
-  ## Load in example data
-  data(china_rt_estimates)
-  data(exante_movement_data)
+  # fake data
+  my_dates <- seq(as.Date("2020-01-01"), as.Date("2020-02-11"), by = "day")
 
-  # join datasets
-  data_joined <- left_join(china_rt_estimates,
-                           exante_movement_data,
-                           by = c("date","province")
-  )
-
-  # calculate rolling correlation
-  data_corr <- rolling_corr(dat = data_joined,
-                            grp_var = "province",
-                            x_var = "r_mean",
-                            y_var = "movement",
-                            n = 14)
+  df <- data.frame(date = rep(my_dates, 2),
+                   grp = c(rep("a", 42), rep("b", 42)),
+                   r_mean = rgamma(84, shape = 4),
+                   movement = rgamma(84, shape = 5),
+                   roll_corr = runif(84, -1, 1)
+        )
 
   # plot
-  p <- plot_corr(dat = data_corr,
+  p <- plot_corr(dat = df,
                  date_var = "date",
-                 grp_var = "province",
+                 grp_var = "grp",
                  x_var = "r_mean",
                  y_var = "movement",
-                 x_var_lower = "r_q2.5",
-                 x_var_upper = "r_q97.5",
-                 y_max = 10
   )
 
   expect_is(p, "ggplot")

@@ -24,12 +24,9 @@ knitr::opts_chunk$set(
 ### Data
 `pika` contains several example data sets in the `data/` directory that can be used to run through the package functions. The example data sets include
 1. Daily confirmed cases of COVID-19 from different provinces in China (china_case_data)
-2. Estimates of effective reproduction number (Rt) over time using the case data in 1 (china_rt_estimates)
-3. Daily within-city movement data for the same  provinces in 1 (exante_movement_data)
+2. Daily within-city movement data for the same  provinces in 1 (exante_movement_data)
 
 The case data has daily confirmed confirmed cases for different provinces in China from 16 January to 24 March 2020 from the dashboard maintained by Chinese Center for Disease Prevention and Control (CCDC) [@noauthor_2020-pv]. The CCDC dashboard collates numbers of confirmed cases reported by national and local health commissions in each province in mainland China, and Hong Kong SAR and Macau SAR. Confirmed cases are defined as suspected cases, who have epidemiological links and/or clinical symptoms, and are detected with SARS-CoV-2 by PCR tests. However, in Hubei province, clinically diagnosed cases were additionally included between 12 and 19 February.
-
-`pika` provides a function (`estimate_rt()`) that enables users to input case data similar to that in 1 and estimate Rt by group using `EpiEstim`. However, for generalisability, a data set of Rt estimates is provided as the primary time series on which to perform the correlation analysis. The Rt estimates were estimated using `pika`'s `estimate_rt()` with `si_mean = 6.48` and `si_std = 3.83` [@Ferguson_undated-yc].
 
 The daily within-city movement data, used as a proxy for economic activity, is available from 1 January to 24 March 2020 for major metropolitan cities within each province in mainland China, Hong Kong SAR, and Macau SAR. These data, provided by Exante Data Inc [@Exante_Data_Inc2020-mo], measured travel activity relative to the 2019 average (excluding Lunar New Year). The underlying data are based on near real-time people movement statistics from Baidu.
 
@@ -37,6 +34,7 @@ The daily within-city movement data, used as a proxy for economic activity, is a
 # Load required packages ----------------------------------------------------------------
 library(dplyr)
 library(knitr)
+library(snakecase)
 
 # Load pika -----------------------------------------------------------------------------
 library(pika)
@@ -49,22 +47,26 @@ To estimate the effective reproduction number (Rt), pika has a function `estimat
 knitr::kable(head(china_case_data, 10))
 ```
 
-To estimate Rt from case data, the user must specify the data set in the `dat = ` argument of `estimate_rt()`. The data set should include three columns: a date column (this should be of class 'date'), a grouping variable, and the value used to estimate Rt (most commonly this is cases, but other quantities can be used, such as deaths). The names of the columns in the input data set should be specified as character strings in the `grp_var = `, `date_var = `, and `incidence_var = ` arguments.
+To estimate Rt from case data, the user must specify the data set in the `dat = ` argument of `estimate_rt()`. The data set should include three columns: a date column (this should be of class 'date'), a grouping variable, and the value used to estimate Rt (most commonly this is cases, but other quantities can be used, such as deaths). The names of the columns in the input data set should be specified as character strings in the `grp_var = `, `date_var = `, and `incidence_var = ` arguments. 
 
 ```{r estimate_rt, message=FALSE, warning=FALSE}
 # to estimate them with pika, use estimate_rt() ------------------------------------------
-pika_rt_estimates <- estimate_rt(dat = china_case_data,
-                                 grp_var = "province",
-                                 date_var = "date",
-                                 incidence_var = "cases"
-                                 )
+rt_estimates <- estimate_rt(dat = china_case_data,
+                            grp_var = "province",
+                            date_var = "date",
+                            incidence_var = "cases"
+                            ) %>%
+  # a little data formatting--------------------------------------------------------------
+  mutate(province = to_snake_case(province)) %>%
+  select(-date_start) %>%
+  rename("date" = "date_end")
 ```
 
 ```{r rt_output, echo=FALSE}
-knitr::kable(head(pika_rt_estimates, 10))
+knitr::kable(head(rt_estimates, 10))
 ```
 
-The method used to estimate Rt can be changed using the `est_method = ` argument. This argument takes the following options: `c("non_parametric_si","parametric_si","uncertain_si","si_from_data","si_from_sample")`. For methods that require specifying the mean and standard deviation of the serial interval, these parameters can be set using the `si_mean = ` and `si_std = ` function arguments.
+The method used to estimate Rt can be changed using the `est_method = ` argument. This argument takes the following options: `c("non_parametric_si","parametric_si","uncertain_si","si_from_data","si_from_sample")`. For methods that require specifying the mean and standard deviation of the serial interval, these parameters can be set using the `si_mean = ` and `si_std = ` function arguments. The default values are `si_mean = 6.48` and `si_std = 3.83` [@Ferguson_undated-yc].
 
 For more information on the methodology underlying `EpiEstim::estimate_R` look at this [vignette](https://cran.r-project.org/web/packages/EpiEstim/vignettes/demo.html) or at `help("estimate_R")`.
 
@@ -73,7 +75,7 @@ When determining the relationship between two time series it is sometimes of int
 ```{r join_data, warning=FALSE}
 # Join data sets together by date and province to determine cross correlation -----------
 # for this we are using input rt estimates, not those estimated using pika::estimate_rt()
-data_joined <- left_join(china_rt_estimates,
+data_joined <- left_join(rt_estimates,
                          exante_movement_data,
                          by = c("date","province")
                          )
@@ -103,16 +105,31 @@ my_lag <- min(lags$lag)
 Once the optimal lag is determined, we must back date our Rt estimates without impacting the date of the movement variable.
 ```{r lag_var}
 # create lag date using max lag from cross_corr() ---------------------------------------
-data_joined_lag <- china_rt_estimates %>%
+data_joined_lag <- rt_estimates %>%
   mutate(date = date + my_lag) %>%
   left_join(., exante_movement_data, by = c("date", "province"))
 ```
 
-## Rolling Correlation
+## Percent change relative to baseline
+Sometimes, it is of interest to convert a count variable over time into a percent change based on the average value in a specified baseline period. Using `calc_percent_change()` users can specify a baseline period that will them be used to determine the percent change in their count variable time series. This function was written for application to mobility data, where the percent change in mobility over time relative to baseline is of interest. However, this function can be applied to any count type time series.
+```{r perc_change}
+perc_change_data <- calc_percent_change(dat = exante_movement_data,
+                                        date_var = "date",
+                                        grp_var = "province", 
+                                        count_var = "movement", 
+                                        n_baseline_periods = 7)
+```
+
+```{r perc_change_output, echo=FALSE}
+knitr::kable(head(perc_change_data, 10))
+```
+
+## Rolling correlation
 It is often of interest to determine the relationship between two time series, specifically the rolling correlation. The `rolling_corr()` function calculates the rolling correlation between two times series (`x_var` and `y_var`) over a specified time window `n = `. Here, we calculate the biweekly rolling correlation between Rt and movement. Since our data is daily estimates of Rt and movement, we set `n = 14`. If our data was monthly and we wanted to determine a 6 month rolling correlation, we would set `n = 6`. The output of `rolling_corr()` is a data frame with an additional column added to the input dataset called "rolling_corr". Depending on the value of `n`, the first `n` values of "rolling_corr" are NA.
 ```{r corr}
 # Determine rolling correlation between Rt and movement ---------------------------------
 data_corr <- rolling_corr(dat = data_joined_lag,
+                          date_var = "date",
                           grp_var = "province",
                           x_var = "r_mean",
                           y_var = "movement",
