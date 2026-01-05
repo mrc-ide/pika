@@ -84,7 +84,7 @@ cross_corr <- function(dat, date_var = NULL, grp_var, x_var, y_var, max_lag = 20
 rolling_corr <- function(dat, date_var = "date", grp_var, x_var, y_var, n = 14){
 
   # check that date_var is of class "Date" ------------------------------------------------
-  if(class(dat[,date_var]) != "Date"){stop("date_var must be of class 'Date'")}
+  if(!inherits(dat[[date_var]], "Date")){stop("date_var must be of class 'Date'")}
 
   # a little bit of data wrangling to feed into runCor ------------------------------------
   dat1 <- dat %>%
@@ -146,7 +146,7 @@ estimate_rt <- function(dat, grp_var, date_var, incidence_var, est_method = "par
     R_t[[i]] <- r$gg[[i]]$R %>%
       mutate(grp = r$grp[i],
              date_start = r$gg[[i]]$dates[.data$t_start],
-             date_end = r$gg[[i]]$dates[.data$t_start][.data$t_end]) %>%
+             date_end = r$gg[[i]]$dates[.data$t_end]) %>%
       rename(r_mean = .data$`Mean(R)`, r_q2.5 = .data$`Quantile.0.025(R)`,
              r_q97.5 = .data$`Quantile.0.975(R)`,
              r_median = .data$`Median(R)`) %>%
@@ -191,9 +191,9 @@ calc_percent_change <- function(dat, date_var = "date", grp_var, count_var,
     stop("Number of baseline periods is larger than number of observations in the input dataset")
   }
 
-  # chack that start_date is a valid format ----------------------------------------------
+  # check that start_date is a valid format ----------------------------------------------
   if(!is.null(start_date)){
-    if((start_date %in% dat[,date_var]) == FALSE){
+    if(!(start_date %in% dat[[date_var]])){
       stop("start_date does not match any dates in input dataset")
     }
   }
@@ -212,7 +212,7 @@ calc_percent_change <- function(dat, date_var = "date", grp_var, count_var,
   baseline <- dat1 %>%
     filter(date %in% baseline_dates) %>%
     group_by(.data$grp) %>%
-    summarise_at(.vars = "counts", .funs = "mean") %>%
+    summarise(counts = mean(counts), .groups = "drop") %>%
     rename("baseline_counts" = "counts")
 
   # calculate percentage change in movement relative to baseline --------------------------

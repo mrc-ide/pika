@@ -6,7 +6,7 @@ output: rmarkdown::html_vignette
 bibliography: pika_vignette.bib
 csl: plos.csl
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{pika: Evaluating Correlation Between Time Series}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

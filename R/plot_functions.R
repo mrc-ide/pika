@@ -103,7 +103,7 @@ plot_lag <- function(dat, lag_var, bins = 2){
     rename(lag = {{ lag_var }})
 
 # make histogram of lags by grouping variable --------------------------------------------
-p <- ggplot(dat, aes(x = lag)) +
+p <- ggplot(dat1, aes(x = lag)) +
   geom_histogram(binwidth = bins) +
   theme(legend.position = "none",
         panel.grid.major = element_blank(),

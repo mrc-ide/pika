@@ -1,0 +1,52 @@
+url: https://mrc-ide.github.io/pika/
+
+template:
+  bootstrap: 5
+  bootswatch: flatly
+
+home:
+  title: pika - Evaluate Correlation Between Time Series
+  description: >
+    A lightweight R package for evaluating correlation between time series,
+    developed for epidemiological applications at the MRC Centre for Global
+    Infectious Disease Analysis.
+
+authors:
+  Kylie Ainslie:
+    href: https://orcid.org/0000-0001-5419-7206
+
+navbar:
+  structure:
+    left: [intro, reference, articles]
+    right: [search, github]
+  components:
+    intro:
+      text: Get started
+      href: articles/pika_vignette.html
+    articles:
+      text: Articles
+      menu:
+        - text: "pika: Evaluating Correlation Between Time Series"
+          href: articles/pika_vignette.html
+
+reference:
+  - title: "Analysis Functions"
+    desc: >
+      Functions for analyzing relationships between time series
+    contents:
+      - cross_corr
+      - rolling_corr
+      - estimate_rt
+      - calc_percent_change
+  - title: "Visualization"
+    desc: >
+      Functions for visualizing results
+    contents:
+      - plot_corr
+      - plot_lag
+  - title: "Data"
+    desc: >
+      Example datasets included in the package
+    contents:
+      - china_case_data
+      - exante_movement_data

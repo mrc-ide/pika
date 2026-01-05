@@ -12,10 +12,13 @@ Description: This package takes two time series as inputs and first, determines 
              the rolling correlation is calculated between the lagged primary time-series and the
              secondary time series.
 License: MIT + file LICENSE
+URL: https://mrc-ide.github.io/pika/, https://github.com/mrc-ide/pika
+BugReports: https://github.com/mrc-ide/pika/issues
 Encoding: UTF-8
 LazyData: true
 Suggests:
     knitr,
+    pkgdown,
     snakecase,
     testthat (>= 2.1.0)
 RoxygenNote: 7.1.0
