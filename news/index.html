@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">pika</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,11 +37,45 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.0" id="pika-020">pika 0.2.0<a class="anchor" aria-label="anchor" href="#pika-020"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-0-2-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-2-0"></a></h3>
+<ul><li>Fixed bug in <code><a href="../reference/estimate_rt.html">estimate_rt()</a></code> where <code>date_end</code> was calculated incorrectly</li>
+<li>Fixed bug in <code><a href="../reference/plot_lag.html">plot_lag()</a></code> where renamed data frame was not used</li>
+<li>Fixed type checking in <code><a href="../reference/rolling_corr.html">rolling_corr()</a></code> to use <code><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits()</a></code> instead of <code><a href="https://rdrr.io/r/base/class.html" class="external-link">class()</a></code>
+</li>
+<li>Replaced deprecated <code>summarise_at()</code> with modern <code>summarise()</code> in <code><a href="../reference/calc_percent_change.html">calc_percent_change()</a></code>
+</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-features-0-2-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-2-0"></a></h3>
+<ul><li>Added pkgdown website at <a href="https://mrc-ide.github.io/pika/" class="uri">https://mrc-ide.github.io/pika/</a>
+</li>
+<li>Added GitHub Actions workflows for R-CMD-check and pkgdown deployment</li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-0-2-0">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-2-0"></a></h3>
+<ul><li>Completely rewrote README with comprehensive usage examples</li>
+<li>Added citation to the associated Wellcome Open Research paper</li>
+<li>Fixed vignette index entry title</li>
+<li>Added URL and BugReports fields to DESCRIPTION</li>
+</ul></div>
+<div class="section level3">
+<h3 id="testing-0-2-0">Testing<a class="anchor" aria-label="anchor" href="#testing-0-2-0"></a></h3>
+<ul><li>Added comprehensive test coverage for all functions</li>
+<li>Added happy path tests for <code><a href="../reference/cross_corr.html">cross_corr()</a></code>, <code><a href="../reference/rolling_corr.html">rolling_corr()</a></code>, <code><a href="../reference/estimate_rt.html">estimate_rt()</a></code>, <code><a href="../reference/calc_percent_change.html">calc_percent_change()</a></code>
+</li>
+<li>Added tests for <code><a href="../reference/plot_lag.html">plot_lag()</a></code> (previously untested)</li>
+<li>Added tests for <code><a href="../reference/plot_corr.html">plot_corr()</a></code> with confidence bands and customization options</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.1" id="pika-011">pika 0.1.1<a class="anchor" aria-label="anchor" href="#pika-011"></a></h2>
 <ul><li>Added a <code>NEWS.md</code> file to track changes to the package.</li>
 <li>Added <code><a href="../reference/calc_percent_change.html">calc_percent_change()</a></code> to calculate the percent change in a time series relative to a baseline period</li>
 </ul></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
