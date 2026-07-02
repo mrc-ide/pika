@@ -41,15 +41,14 @@ cross_corr <- function(dat, date_var = NULL, grp_var, x_var, y_var, max_lag = 20
     rename(x_var = {{x_var}}, y_var = {{y_var}}) %>% # rename x_var and y_var for ccf ---
     filter(!is.na(x_var), !is.na(y_var)) %>% # remove NA values -------------------------
   tidyr::nest(gg = -c(grp_var)) %>%
-    mutate_at("gg",purrr::map, function(x) stats::ccf(x$x_var, x$y_var, lag.max = max_lag))
+    mutate(gg = purrr::map(.data$gg, function(x) stats::ccf(x$x_var, x$y_var, lag.max = max_lag)))
 
   # determine lags with max cross correlation -------------------------------------------
   lags_max <- numeric(nrow(rhos)) # empty vector for max lag values by grp_var ----------
 
-  for (p in 1:nrow(rhos)){ # loop through grp_var values to determine max lag for each --
+  for (p in seq_len(nrow(rhos))){ # loop through grp_var values to determine max lag for each --
     # member of grp_var ------------------------------------------
     df <- tibble(
-      name = rhos[p,1],
       lags = rhos$gg[[p]]$lag[,1,1],
       cc = rhos$gg[[p]]$acf[,1,1]
     ) %>%
@@ -58,9 +57,10 @@ cross_corr <- function(dat, date_var = NULL, grp_var, x_var, y_var, max_lag = 20
   }
   # create tibble of max lag by grp_var -------------------------------------------------
   lag_df <- tibble(
-    grp = rhos[,grp_var],
+    grp = rhos[[grp_var]],
     lag = lags_max
   )
+  names(lag_df)[1] <- grp_var
 
   # output ------------------------------------------------------------------------------
   return(lag_df)
@@ -136,13 +136,12 @@ estimate_rt <- function(dat, grp_var, date_var, incidence_var, est_method = "par
   rename(dates = {{date_var}}, I = {{incidence_var}}, grp = {{ grp_var }}) %>%
     # group by grp
     tidyr::nest(gg = -"grp") %>%
-    mutate_at("gg", purrr::map,function(x) estimate_R(x, method=est_method,
+    mutate(gg = purrr::map(.data$gg, function(x) estimate_R(x, method=est_method,
                                                       config = make_config(list(mean_si = si_mean,
-                                                                                std_si = si_std)))
-    )
+                                                                                std_si = si_std)))))
   # loop through groups to extract R estimates ------------------------------------------------
   R_t <- list()
-  for(i in 1:length(r$grp)){
+  for(i in seq_along(r$grp)){
     R_t[[i]] <- r$gg[[i]]$R %>%
       mutate(grp = r$grp[i],
              date_start = r$gg[[i]]$dates[.data$t_start],
@@ -187,12 +186,14 @@ calc_percent_change <- function(dat, date_var = "date", grp_var, count_var,
                                 n_baseline_periods = 7, start_date = NULL){
 
   # check that there are enough observations for n_baseline_periods ----------------------
-  if(n_baseline_periods > nrow(dat)){
-    stop("Number of baseline periods is larger than number of observations in the input dataset")
+  min_group_size <- min(table(dat[[grp_var]]))
+  if(n_baseline_periods > min_group_size){
+    stop("Number of baseline periods is larger than the number of observations per group in the input dataset")
   }
 
   # check that start_date is a valid format ----------------------------------------------
   if(!is.null(start_date)){
+    start_date <- as.Date(start_date)
     if(!(start_date %in% dat[[date_var]])){
       stop("start_date does not match any dates in input dataset")
     }
@@ -218,7 +219,7 @@ calc_percent_change <- function(dat, date_var = "date", grp_var, count_var,
   # calculate percentage change in movement relative to baseline --------------------------
   dat1a <- left_join(dat1, baseline, by = "grp")
   rtn <- dat1a %>%
-    mutate(perc_change = .data$counts / .data$baseline_counts) %>%
+    mutate(perc_change = .data$counts / .data$baseline_counts - 1) %>%
     dplyr::select(-.data$baseline_counts)
 
   # rename columns back to original column names ------------------------------------------

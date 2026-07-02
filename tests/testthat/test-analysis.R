@@ -1,5 +1,3 @@
-context("analysis")
-
 # Helper function to create test data
 create_test_data <- function(n_days = 42, n_groups = 2) {
   my_dates <- seq(as.Date("2020-01-01"), by = "day", length.out = n_days)
@@ -362,11 +360,11 @@ test_that("calc_percent_change calculates correct values", {
   )
 
   # Check calculated percent changes
-  # baseline average = 100, so perc_change = value / 100
-  expect_equal(result$perc_change[8], 0.5, tolerance = 0.001)   # 50/100
-  expect_equal(result$perc_change[9], 1.0, tolerance = 0.001)   # 100/100
-  expect_equal(result$perc_change[10], 1.5, tolerance = 0.001)  # 150/100
-  expect_equal(result$perc_change[11], 2.0, tolerance = 0.001)  # 200/100
+  # baseline average = 100, so perc_change = (value - 100) / 100
+  expect_equal(result$perc_change[8], -0.5, tolerance = 0.001)   # (50-100)/100
+  expect_equal(result$perc_change[9], 0.0, tolerance = 0.001)    # (100-100)/100
+  expect_equal(result$perc_change[10], 0.5, tolerance = 0.001)   # (150-100)/100
+  expect_equal(result$perc_change[11], 1.0, tolerance = 0.001)   # (200-100)/100
 })
 
 test_that("calc_percent_change works with custom start_date", {
@@ -388,8 +386,8 @@ test_that("calc_percent_change works with custom start_date", {
   )
 
   # With start_date = 2020-01-08, baseline = 100
-  # perc_change for last week should be 1.5 (150/100)
-  expect_equal(result$perc_change[15], 1.5, tolerance = 0.001)
+  # perc_change for last week should be 0.5 ((150-100)/100)
+  expect_equal(result$perc_change[15], 0.5, tolerance = 0.001)
 })
 
 test_that("calc_percent_change works with multiple groups", {
@@ -408,13 +406,13 @@ test_that("calc_percent_change works with multiple groups", {
     n_baseline_periods = 7
   )
 
-  # Group a: 200/100 = 2.0
+  # Group a: (200-100)/100 = 1.0
   result_a <- result[result$grp == "a", ]
-  expect_equal(result_a$perc_change[14], 2.0, tolerance = 0.001)
+  expect_equal(result_a$perc_change[14], 1.0, tolerance = 0.001)
 
-  # Group b: 100/50 = 2.0
+  # Group b: (100-50)/50 = 1.0
   result_b <- result[result$grp == "b", ]
-  expect_equal(result_b$perc_change[14], 2.0, tolerance = 0.001)
+  expect_equal(result_b$perc_change[14], 1.0, tolerance = 0.001)
 })
 
 test_that("calc_percent_change throws an error when n_baseline_periods is larger than nrow(dat)", {
