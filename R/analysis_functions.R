@@ -119,10 +119,13 @@ cross_corr <- function(dat, date_var = NULL, grp_var, x_var, y_var, max_lag = 20
 #' @param y_var Character string giving the name of the secondary time series column.
 #' @param n Integer. Width of the rolling window in time periods. Default is 14.
 #'
-#' @return The input data frame with one additional numeric column,
-#'   \code{roll_corr}, containing the rolling Pearson correlation between
-#'   \code{x_var} and \code{y_var}. Values range from -1 to 1. The first
-#'   \code{n - 1} observations per group are \code{NA}.
+#' @return A data frame with the same columns as the input plus one additional
+#'   numeric column, \code{roll_corr}, containing the rolling Pearson
+#'   correlation between \code{x_var} and \code{y_var}. Values range from -1
+#'   to 1. The first \code{n - 1} observations per group are \code{NA}. Note
+#'   that rows where \code{x_var} or \code{y_var} are \code{NA} are removed
+#'   before the rolling correlation is computed, so the returned frame may have
+#'   fewer rows than the input.
 #'
 #' @seealso \code{\link{cross_corr}} to identify the optimal lag before
 #'   computing rolling correlation; \code{\link[TTR]{runCor}} for the
@@ -303,9 +306,9 @@ estimate_rt <- function(dat, grp_var, date_var, incidence_var, est_method = "par
 #'   compute the baseline mean. For daily data, \code{7} gives a one-week
 #'   baseline. Default is 7.
 #' @param start_date Start date of the baseline period. Accepts a \code{Date}
-#'   object or a character string in the same format as \code{date_var}
-#'   (e.g. \code{"YYYY-MM-DD"}). If \code{NULL} (default), the earliest date
-#'   in the data is used.
+#'   object or a character string in \code{"YYYY-MM-DD"} format
+#'   (e.g. \code{"2020-01-13"}). If \code{NULL} (default), the earliest date
+#'   across the combined dataset is used as the baseline start.
 #'
 #' @return The input data frame with one additional numeric column,
 #'   \code{perc_change}, giving each observation as a fractional change

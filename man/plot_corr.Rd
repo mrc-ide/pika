@@ -48,7 +48,8 @@ the grouping column. If \code{NULL} (default), raw group values are shown.}
 
 \item{legend_labels}{Character vector of length 3 giving legend labels for
 \code{roll_corr}, \code{x_var}, and \code{y_var} respectively. If
-\code{NULL} (default), column names are used.}
+\code{NULL} (default), the internal metric names (\code{roll_corr},
+\code{x_var}, \code{y_var}) are shown in the legend.}
 
 \item{y_max}{Numeric. Maximum value for the y-axis. If supplied, the axis is
 set to \code{[-1, y_max]} and confidence bounds are clamped to this value.
@@ -65,9 +66,10 @@ A \code{\link[ggplot2]{ggplot}} object.
 Produces a faceted line plot showing the primary series (\code{x_var}),
 secondary series (\code{y_var}), and rolling correlation (\code{roll_corr})
 over time, with one facet per group. Horizontal reference lines are drawn
-at y = -1, 0, and 1. Optionally adds a shaded confidence ribbon around
-\code{x_var}. The data frame must contain a column named \code{roll_corr}
-(e.g. from \code{\link{rolling_corr}}).
+at y = -1 (dashed), 0 (solid), and 1 (dashed). Optionally adds a shaded
+confidence ribbon around \code{x_var}. If \code{dat} contains a column
+named \code{roll_corr} (e.g. from \code{\link{rolling_corr}}) it will be
+included in the plot; if absent the line is simply omitted.
 }
 \examples{
 \dontrun{

@@ -23,10 +23,13 @@ Rolling correlation is computed separately within each group.}
 \item{n}{Integer. Width of the rolling window in time periods. Default is 14.}
 }
 \value{
-The input data frame with one additional numeric column,
-  \code{roll_corr}, containing the rolling Pearson correlation between
-  \code{x_var} and \code{y_var}. Values range from -1 to 1. The first
-  \code{n - 1} observations per group are \code{NA}.
+A data frame with the same columns as the input plus one additional
+  numeric column, \code{roll_corr}, containing the rolling Pearson
+  correlation between \code{x_var} and \code{y_var}. Values range from -1
+  to 1. The first \code{n - 1} observations per group are \code{NA}. Note
+  that rows where \code{x_var} or \code{y_var} are \code{NA} are removed
+  before the rolling correlation is computed, so the returned frame may have
+  fewer rows than the input.
 }
 \description{
 Computes the Pearson correlation between \code{x_var} and \code{y_var}

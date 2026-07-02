@@ -30,9 +30,9 @@ compute the baseline mean. For daily data, \code{7} gives a one-week
 baseline. Default is 7.}
 
 \item{start_date}{Start date of the baseline period. Accepts a \code{Date}
-object or a character string in the same format as \code{date_var}
-(e.g. \code{"YYYY-MM-DD"}). If \code{NULL} (default), the earliest date
-in the data is used.}
+object or a character string in \code{"YYYY-MM-DD"} format
+(e.g. \code{"2020-01-13"}). If \code{NULL} (default), the earliest date
+across the combined dataset is used as the baseline start.}
 }
 \value{
 The input data frame with one additional numeric column,
