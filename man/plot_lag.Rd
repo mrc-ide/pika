@@ -2,21 +2,39 @@
 % Please edit documentation in R/plot_functions.R
 \name{plot_lag}
 \alias{plot_lag}
-\title{This function plots the lags by grp_var}
+\title{Plot a histogram of optimal lags across groups}
 \usage{
 plot_lag(dat, lag_var, bins = 2)
 }
 \arguments{
-\item{dat}{data frame with columns that correspond to two time series and grouping variable(s)}
+\item{dat}{A data frame containing a lag column, typically the output of
+\code{\link{cross_corr}}.}
 
-\item{lag_var}{character string of the column name that corresponds to the date variable}
+\item{lag_var}{Character string giving the name of the lag column to plot.}
 
-\item{bins}{character string of column names in dat to be used as grouping variable(s)}
+\item{bins}{Numeric. Bin width for the histogram. Default is 2.}
 }
 \value{
-tibble of lags by grp_var
+A \code{\link[ggplot2]{ggplot}} object.
 }
 \description{
-This function plots the lags by grp_var
+Produces a histogram of the lag values returned by \code{\link{cross_corr}},
+showing the distribution of optimal lags across groups.
+}
+\examples{
+\dontrun{
+lags <- cross_corr(
+  dat     = my_data,
+  grp_var = "region",
+  x_var   = "r_mean",
+  y_var   = "movement"
+)
+plot_lag(lags, lag_var = "lag")
+}
+
+}
+\seealso{
+\code{\link{cross_corr}} to compute the lag values;
+  \code{\link{plot_corr}} to visualise the time series and rolling correlation.
 }
 \keyword{pika}

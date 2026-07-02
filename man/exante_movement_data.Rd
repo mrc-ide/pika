@@ -8,8 +8,8 @@
 A data frame with 672 rows and 3 variables:
  \describe{
    \item{date}{date, in YYYY-MM-DD format}
-   \item{province}{name of province/region in China where cases occured}
-   \item{movement}{daily population-weighted with-in city movement index}
+   \item{province}{name of province/region in China}
+   \item{movement}{daily population-weighted within-city movement index}
 }
 }
 \usage{

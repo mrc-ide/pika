@@ -1,6 +1,6 @@
 #' Daily confirmed cases of COVID-19 in China
 #'
-#' The case data has daily confirmed confirmed cases for different provinces in China from 16 January to 24 March 2020
+#' The case data has daily confirmed cases for different provinces in China from 16 January to 24 March 2020
 #' from the dashboard maintained by Chinese Center for Disease Prevention and Control (CCDC). The CCDC dashboard
 #' collates numbers of confirmed cases reported by national and local health commissions in each province in mainland
 #' China, and Hong Kong SAR and Macau SAR. Confirmed cases are defined as suspected cases, who have epidemiological
@@ -26,7 +26,7 @@
 #' @format A data frame with 672 rows and 3 variables:
 #'  \describe{
 #'    \item{date}{date, in YYYY-MM-DD format}
-#'    \item{province}{name of province/region in China where cases occured}
-#'    \item{movement}{daily population-weighted with-in city movement index}
+#'    \item{province}{name of province/region in China}
+#'    \item{movement}{daily population-weighted within-city movement index}
 #' }
 "exante_movement_data"

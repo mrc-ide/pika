@@ -2,27 +2,55 @@
 % Please edit documentation in R/analysis_functions.R
 \name{rolling_corr}
 \alias{rolling_corr}
-\title{Calculate rolling correlation between two time series by group}
+\title{Calculate rolling (moving-window) correlation between two time series}
 \usage{
 rolling_corr(dat, date_var = "date", grp_var, x_var, y_var, n = 14)
 }
 \arguments{
-\item{dat}{data frame with columns that correspond to two time series and grouping variable}
+\item{dat}{A data frame containing the two time series, a date column, and
+a grouping column.}
 
-\item{date_var}{character string of date column name (should be of class "Date")}
+\item{date_var}{Character string giving the name of the date column. Must be
+of class \code{Date}. Default is \code{"date"}.}
 
-\item{grp_var}{character string of column name in dat to be used as grouping variable}
+\item{grp_var}{Character string giving the name of the grouping column.
+Rolling correlation is computed separately within each group.}
 
-\item{x_var}{primary time series (should be a column in dat)}
+\item{x_var}{Character string giving the name of the primary time series column.}
 
-\item{y_var}{secondary time series (should be a column in dat)}
+\item{y_var}{Character string giving the name of the secondary time series column.}
 
-\item{n}{the number of time periods over which to calculate rolling correlation}
+\item{n}{Integer. Width of the rolling window in time periods. Default is 14.}
 }
 \value{
-tibble of lags by grp_var
+The input data frame with one additional numeric column,
+  \code{roll_corr}, containing the rolling Pearson correlation between
+  \code{x_var} and \code{y_var}. Values range from -1 to 1. The first
+  \code{n - 1} observations per group are \code{NA}.
 }
 \description{
-This function calculates the rolling correlation between two time series
+Computes the Pearson correlation between \code{x_var} and \code{y_var}
+over a rolling window of \code{n} time periods within each group, using
+\code{\link[TTR]{runCor}}. The first \code{n - 1} observations in each
+group will be \code{NA} because there are insufficient data to fill the
+window.
+}
+\examples{
+\dontrun{
+data_corr <- rolling_corr(
+  dat      = my_data,
+  date_var = "date",
+  grp_var  = "region",
+  x_var    = "r_mean",
+  y_var    = "movement",
+  n        = 14
+)
+}
+
+}
+\seealso{
+\code{\link{cross_corr}} to identify the optimal lag before
+  computing rolling correlation; \code{\link[TTR]{runCor}} for the
+  underlying method; \code{\link{plot_corr}} to visualise the result.
 }
 \keyword{pika}

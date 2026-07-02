@@ -2,7 +2,7 @@
 % Please edit documentation in R/analysis_functions.R
 \name{estimate_rt}
 \alias{estimate_rt}
-\title{Estimate reproduction over time by group}
+\title{Estimate the effective reproduction number (Rt) over time by group}
 \usage{
 estimate_rt(
   dat,
@@ -15,28 +15,77 @@ estimate_rt(
 )
 }
 \arguments{
-\item{dat}{data frame with columns that correspond to two time series and grouping variable(s)}
+\item{dat}{A data frame with at least a date column, an incidence column,
+and a grouping column. No \code{NA} values are permitted in
+\code{incidence_var}.}
 
-\item{grp_var}{character string of column names in dat to be used as grouping variable(s)}
+\item{grp_var}{Character string giving the name of the grouping column. Rt
+is estimated independently for each group.}
 
-\item{date_var}{primary time series (should be a column in dat)}
+\item{date_var}{Character string giving the name of the date column.}
 
-\item{incidence_var}{secondary time series (should be a column in dat)}
+\item{incidence_var}{Character string giving the name of the daily incidence
+(case count) column.}
 
-\item{est_method}{estimation method to be used to estimate R in EpiEstim:
-c("non_parametric_si","parametric_si","uncertain_si","si_from_data","si_from_sample")}
+\item{est_method}{Character string specifying the serial interval estimation
+method passed to \code{\link[EpiEstim]{estimate_R}}. One of
+\code{"parametric_si"} (default), \code{"non_parametric_si"},
+\code{"uncertain_si"}, \code{"si_from_data"}, or \code{"si_from_sample"}.}
 
-\item{si_mean}{mean of serial interval distribution to be specified when
-est_method = "parametric_si"}
+\item{si_mean}{Mean of the serial interval distribution (days). Used when
+\code{est_method = "parametric_si"}. Default is 6.48 (COVID-19;
+Nishiura et al. 2020).}
 
-\item{si_std}{standard deviation of serial interval distribution to be specified when
-est_method = "parametric_si"}
+\item{si_std}{Standard deviation of the serial interval distribution (days).
+Used when \code{est_method = "parametric_si"}. Default is 3.83 (COVID-19;
+Nishiura et al. 2020).}
 }
 \value{
-data frame of mean, median, and 95% credible interval reproduction number
+A data frame with one row per estimation window per group, containing:
+  \describe{
+    \item{\code{date_start}}{Start date of the estimation window.}
+    \item{\code{date_end}}{End date of the estimation window.}
+    \item{\code{<grp_var>}}{Group identifier; column name matches \code{grp_var}.}
+    \item{\code{r_mean}}{Posterior mean Rt.}
+    \item{\code{r_median}}{Posterior median Rt.}
+    \item{\code{r_q2.5}}{2.5th percentile of the posterior (lower 95\% credible interval).}
+    \item{\code{r_q97.5}}{97.5th percentile of the posterior (upper 95\% credible interval).}
+  }
 }
 \description{
-This function estimates reproduction number by group using EpiEstim's estimate_R() and
-then binds the results together into a single data frame
+A grouped wrapper around \code{\link[EpiEstim]{estimate_R}} (Cori et al.
+2013). For each group, Rt is estimated in a sliding weekly window using a
+Bayesian framework with a Gamma-distributed serial interval. Results from all
+groups are combined into a single data frame.
+}
+\details{
+The default serial interval parameters (\code{si_mean = 6.48},
+\code{si_std = 3.83}) are from Nishiura et al. (2020) for COVID-19 and
+should be updated for other pathogens.
+}
+\examples{
+\dontrun{
+rt_estimates <- estimate_rt(
+  dat           = china_case_data,
+  grp_var       = "province",
+  date_var      = "date",
+  incidence_var = "cases"
+)
+}
+
+}
+\references{
+Cori A, Ferguson NM, Fraser C, Cauchemez S (2013). A new framework and
+software to estimate time-varying reproduction numbers during epidemics.
+\emph{American Journal of Epidemiology}, 178(9), 1505--1512.
+\doi{10.1093/aje/kwt133}
+
+Nishiura H, Linton NM, Akhmetzhanov AR (2020). Serial interval of novel
+coronavirus (COVID-19) infections. \emph{International Journal of Infectious
+Diseases}, 93, 284--286. \doi{10.1016/j.ijid.2020.02.060}
+}
+\seealso{
+\code{\link[EpiEstim]{estimate_R}} for full estimation control,
+  including non-parametric serial intervals.
 }
 \keyword{pika}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/analysis_functions.R
 \name{cross_corr}
 \alias{cross_corr}
-\title{Determine cross correlation between two time series for different lags}
+\title{Find the lag at which cross-correlation between two time series is maximised}
 \usage{
 cross_corr(
   dat,
@@ -15,25 +15,58 @@ cross_corr(
 )
 }
 \arguments{
-\item{dat}{data frame with columns that correspond to two time series and grouping variable(s)}
+\item{dat}{A data frame containing the two time series and a grouping column.}
 
-\item{date_var}{character string of the column name that corresponds to the date variable
-date_var must be specified if subset_date is not null.}
+\item{date_var}{Character string giving the name of the date column. Required
+when \code{subset_date} is non-\code{NULL}.}
 
-\item{grp_var}{character string of column names in dat to be used as grouping variable(s)}
+\item{grp_var}{Character string giving the name of the grouping column. The
+CCF is computed separately within each group.}
 
-\item{x_var}{primary time series (should be a column in dat)}
+\item{x_var}{Character string giving the name of the primary (leading) time
+series column.}
 
-\item{y_var}{secondary time series (should be a column in dat)}
+\item{y_var}{Character string giving the name of the secondary (lagged) time
+series column.}
 
-\item{max_lag}{integer value of the number of lags to perform cross correlation for}
+\item{max_lag}{Integer. Maximum number of lags to evaluate. CCF is computed
+for lags \code{-max_lag} to 0. Default is 20.}
 
-\item{subset_date}{a character string of the same format as the date variable}
+\item{subset_date}{Character string in the same format as \code{date_var}.
+If supplied, only rows with dates on or before \code{subset_date} are used.
+Requires \code{date_var} to be specified.}
 }
 \value{
-tibble of lags by grp_var
+A tibble with one row per group containing:
+  \describe{
+    \item{\code{<grp_var>}}{Group identifier; column name matches \code{grp_var}.}
+    \item{\code{lag}}{Integer \eqn{\leq 0}. The lag at which the CCF between
+      \code{x_var} and \code{y_var} is highest within that group.}
+  }
 }
 \description{
-This function determines lag at which the cross correlation is highest
+Computes the cross-correlation function (CCF) between \code{x_var} and
+\code{y_var} for lags from \code{-max_lag} to 0 using
+\code{\link[stats]{ccf}}, then returns the lag with the highest CCF for each
+group. Only non-positive lags are considered (i.e. \code{x_var} leading
+\code{y_var}), reflecting the assumption that changes in the primary series
+precede changes in the secondary series.
+}
+\examples{
+\dontrun{
+lags <- cross_corr(
+  dat      = my_data,
+  date_var = "date",
+  grp_var  = "region",
+  x_var    = "r_mean",
+  y_var    = "movement",
+  max_lag  = 14
+)
+}
+
+}
+\seealso{
+\code{\link{rolling_corr}} to compute rolling correlation at the
+  identified lag; \code{\link[stats]{ccf}} for the underlying CCF method.
 }
 \keyword{pika}

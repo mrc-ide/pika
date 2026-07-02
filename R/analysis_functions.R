@@ -1,18 +1,52 @@
 # Functions to perform correlation analysis of two time series --------------------------
 
 
-#' Determine cross correlation between two time series for different lags
+#' Find the lag at which cross-correlation between two time series is maximised
 #'
-#' This function determines lag at which the cross correlation is highest
-#' @param dat data frame with columns that correspond to two time series and grouping variable(s)
-#' @param date_var character string of the column name that corresponds to the date variable
-#' date_var must be specified if subset_date is not null.
-#' @param grp_var character string of column names in dat to be used as grouping variable(s)
-#' @param x_var primary time series (should be a column in dat)
-#' @param y_var secondary time series (should be a column in dat)
-#' @param max_lag integer value of the number of lags to perform cross correlation for
-#' @param subset_date a character string of the same format as the date variable
-#' @return tibble of lags by grp_var
+#' Computes the cross-correlation function (CCF) between \code{x_var} and
+#' \code{y_var} for lags from \code{-max_lag} to 0 using
+#' \code{\link[stats]{ccf}}, then returns the lag with the highest CCF for each
+#' group. Only non-positive lags are considered (i.e. \code{x_var} leading
+#' \code{y_var}), reflecting the assumption that changes in the primary series
+#' precede changes in the secondary series.
+#'
+#' @param dat A data frame containing the two time series and a grouping column.
+#' @param date_var Character string giving the name of the date column. Required
+#'   when \code{subset_date} is non-\code{NULL}.
+#' @param grp_var Character string giving the name of the grouping column. The
+#'   CCF is computed separately within each group.
+#' @param x_var Character string giving the name of the primary (leading) time
+#'   series column.
+#' @param y_var Character string giving the name of the secondary (lagged) time
+#'   series column.
+#' @param max_lag Integer. Maximum number of lags to evaluate. CCF is computed
+#'   for lags \code{-max_lag} to 0. Default is 20.
+#' @param subset_date Character string in the same format as \code{date_var}.
+#'   If supplied, only rows with dates on or before \code{subset_date} are used.
+#'   Requires \code{date_var} to be specified.
+#'
+#' @return A tibble with one row per group containing:
+#'   \describe{
+#'     \item{\code{<grp_var>}}{Group identifier; column name matches \code{grp_var}.}
+#'     \item{\code{lag}}{Integer \eqn{\leq 0}. The lag at which the CCF between
+#'       \code{x_var} and \code{y_var} is highest within that group.}
+#'   }
+#'
+#' @seealso \code{\link{rolling_corr}} to compute rolling correlation at the
+#'   identified lag; \code{\link[stats]{ccf}} for the underlying CCF method.
+#'
+#' @examples
+#' \dontrun{
+#' lags <- cross_corr(
+#'   dat      = my_data,
+#'   date_var = "date",
+#'   grp_var  = "region",
+#'   x_var    = "r_mean",
+#'   y_var    = "movement",
+#'   max_lag  = 14
+#' )
+#' }
+#'
 #' @keywords pika
 #' @import dplyr
 #' @import tidyr
@@ -67,16 +101,45 @@ cross_corr <- function(dat, date_var = NULL, grp_var, x_var, y_var, max_lag = 20
 }
 
 
-#' Calculate rolling correlation between two time series by group
+#' Calculate rolling (moving-window) correlation between two time series
 #'
-#' This function calculates the rolling correlation between two time series
-#' @param dat data frame with columns that correspond to two time series and grouping variable
-#' @param date_var character string of date column name (should be of class "Date")
-#' @param grp_var character string of column name in dat to be used as grouping variable
-#' @param x_var primary time series (should be a column in dat)
-#' @param y_var secondary time series (should be a column in dat)
-#' @param n the number of time periods over which to calculate rolling correlation
-#' @return tibble of lags by grp_var
+#' Computes the Pearson correlation between \code{x_var} and \code{y_var}
+#' over a rolling window of \code{n} time periods within each group, using
+#' \code{\link[TTR]{runCor}}. The first \code{n - 1} observations in each
+#' group will be \code{NA} because there are insufficient data to fill the
+#' window.
+#'
+#' @param dat A data frame containing the two time series, a date column, and
+#'   a grouping column.
+#' @param date_var Character string giving the name of the date column. Must be
+#'   of class \code{Date}. Default is \code{"date"}.
+#' @param grp_var Character string giving the name of the grouping column.
+#'   Rolling correlation is computed separately within each group.
+#' @param x_var Character string giving the name of the primary time series column.
+#' @param y_var Character string giving the name of the secondary time series column.
+#' @param n Integer. Width of the rolling window in time periods. Default is 14.
+#'
+#' @return The input data frame with one additional numeric column,
+#'   \code{roll_corr}, containing the rolling Pearson correlation between
+#'   \code{x_var} and \code{y_var}. Values range from -1 to 1. The first
+#'   \code{n - 1} observations per group are \code{NA}.
+#'
+#' @seealso \code{\link{cross_corr}} to identify the optimal lag before
+#'   computing rolling correlation; \code{\link[TTR]{runCor}} for the
+#'   underlying method; \code{\link{plot_corr}} to visualise the result.
+#'
+#' @examples
+#' \dontrun{
+#' data_corr <- rolling_corr(
+#'   dat      = my_data,
+#'   date_var = "date",
+#'   grp_var  = "region",
+#'   x_var    = "r_mean",
+#'   y_var    = "movement",
+#'   n        = 14
+#' )
+#' }
+#'
 #' @keywords pika
 #' @import TTR
 #' @export
@@ -105,21 +168,70 @@ rolling_corr <- function(dat, date_var = "date", grp_var, x_var, y_var, n = 14){
 }
 
 
-#' Estimate reproduction over time by group
+#' Estimate the effective reproduction number (Rt) over time by group
 #'
-#' This function estimates reproduction number by group using EpiEstim's estimate_R() and
-#' then binds the results together into a single data frame
-#' @param dat data frame with columns that correspond to two time series and grouping variable(s)
-#' @param grp_var character string of column names in dat to be used as grouping variable(s)
-#' @param date_var primary time series (should be a column in dat)
-#' @param incidence_var secondary time series (should be a column in dat)
-#' @param est_method estimation method to be used to estimate R in EpiEstim:
-#' c("non_parametric_si","parametric_si","uncertain_si","si_from_data","si_from_sample")
-#' @param si_mean mean of serial interval distribution to be specified when
-#' est_method = "parametric_si"
-#' @param si_std standard deviation of serial interval distribution to be specified when
-#' est_method = "parametric_si"
-#' @return data frame of mean, median, and 95% credible interval reproduction number
+#' A grouped wrapper around \code{\link[EpiEstim]{estimate_R}} (Cori et al.
+#' 2013). For each group, Rt is estimated in a sliding weekly window using a
+#' Bayesian framework with a Gamma-distributed serial interval. Results from all
+#' groups are combined into a single data frame.
+#'
+#' The default serial interval parameters (\code{si_mean = 6.48},
+#' \code{si_std = 3.83}) are from Nishiura et al. (2020) for COVID-19 and
+#' should be updated for other pathogens.
+#'
+#' @param dat A data frame with at least a date column, an incidence column,
+#'   and a grouping column. No \code{NA} values are permitted in
+#'   \code{incidence_var}.
+#' @param grp_var Character string giving the name of the grouping column. Rt
+#'   is estimated independently for each group.
+#' @param date_var Character string giving the name of the date column.
+#' @param incidence_var Character string giving the name of the daily incidence
+#'   (case count) column.
+#' @param est_method Character string specifying the serial interval estimation
+#'   method passed to \code{\link[EpiEstim]{estimate_R}}. One of
+#'   \code{"parametric_si"} (default), \code{"non_parametric_si"},
+#'   \code{"uncertain_si"}, \code{"si_from_data"}, or \code{"si_from_sample"}.
+#' @param si_mean Mean of the serial interval distribution (days). Used when
+#'   \code{est_method = "parametric_si"}. Default is 6.48 (COVID-19;
+#'   Nishiura et al. 2020).
+#' @param si_std Standard deviation of the serial interval distribution (days).
+#'   Used when \code{est_method = "parametric_si"}. Default is 3.83 (COVID-19;
+#'   Nishiura et al. 2020).
+#'
+#' @return A data frame with one row per estimation window per group, containing:
+#'   \describe{
+#'     \item{\code{date_start}}{Start date of the estimation window.}
+#'     \item{\code{date_end}}{End date of the estimation window.}
+#'     \item{\code{<grp_var>}}{Group identifier; column name matches \code{grp_var}.}
+#'     \item{\code{r_mean}}{Posterior mean Rt.}
+#'     \item{\code{r_median}}{Posterior median Rt.}
+#'     \item{\code{r_q2.5}}{2.5th percentile of the posterior (lower 95\% credible interval).}
+#'     \item{\code{r_q97.5}}{97.5th percentile of the posterior (upper 95\% credible interval).}
+#'   }
+#'
+#' @references
+#' Cori A, Ferguson NM, Fraser C, Cauchemez S (2013). A new framework and
+#' software to estimate time-varying reproduction numbers during epidemics.
+#' \emph{American Journal of Epidemiology}, 178(9), 1505--1512.
+#' \doi{10.1093/aje/kwt133}
+#'
+#' Nishiura H, Linton NM, Akhmetzhanov AR (2020). Serial interval of novel
+#' coronavirus (COVID-19) infections. \emph{International Journal of Infectious
+#' Diseases}, 93, 284--286. \doi{10.1016/j.ijid.2020.02.060}
+#'
+#' @seealso \code{\link[EpiEstim]{estimate_R}} for full estimation control,
+#'   including non-parametric serial intervals.
+#'
+#' @examples
+#' \dontrun{
+#' rt_estimates <- estimate_rt(
+#'   dat           = china_case_data,
+#'   grp_var       = "province",
+#'   date_var      = "date",
+#'   incidence_var = "cases"
+#' )
+#' }
+#'
 #' @keywords pika
 #' @import EpiEstim
 #' @export
@@ -165,20 +277,53 @@ estimate_rt <- function(dat, grp_var, date_var, incidence_var, est_method = "par
 }
 
 
-#' Convert a count variable into percent change relative to baseline
+#' Convert a count time series to fractional change relative to a baseline period
 #'
-#' This function converts a count variable over time into a percent change based on the average
-#' value in the specified baseline period. This function was written for application to
-#' mobility data, where the percent change in mobility over time relative to baseline is of
-#' interest. However, this function can be applied to any count type time series.
-#' @param dat data frame with columns that correspond to count variable and grouping variable
-#' @param grp_var character string of column name in dat to be used as grouping variable
-#' @param date_var character string of the name of the date column (should be of class "Date")
-#' @param count_var character string of the name of the count column, such as number of trips
-#' @param n_baseline_periods Number of periods to calculate baseline average over. For example,
-#' if the time series is days, n_baseline_periods = 7 for a baseline week.
-#' @param start_date start date of baseline period (character string)
-#' @return data frame of with an additional column of the percent change relative to baseline
+#' For each group, computes the mean of \code{count_var} over a baseline period
+#' of \code{n_baseline_periods} consecutive time steps starting at
+#' \code{start_date} (or the earliest date if \code{start_date} is \code{NULL}).
+#' Each observation is then expressed as a fractional change relative to that
+#' baseline mean:
+#'
+#' \deqn{\texttt{perc\_change} = \frac{\texttt{count} -
+#'   \texttt{baseline mean}}{\texttt{baseline mean}}}
+#'
+#' A value of 0 indicates no change from baseline; -0.5 indicates a 50\%
+#' decrease; 1.0 indicates a doubling. Originally developed for population
+#' mobility data but applicable to any non-negative count series.
+#'
+#' @param dat A data frame containing a count column, a date column, and a
+#'   grouping column.
+#' @param date_var Character string giving the name of the date column (class
+#'   \code{Date}). Default is \code{"date"}.
+#' @param grp_var Character string giving the name of the grouping column. The
+#'   baseline mean is computed separately per group.
+#' @param count_var Character string giving the name of the count column.
+#' @param n_baseline_periods Integer. Number of consecutive time steps used to
+#'   compute the baseline mean. For daily data, \code{7} gives a one-week
+#'   baseline. Default is 7.
+#' @param start_date Start date of the baseline period. Accepts a \code{Date}
+#'   object or a character string in the same format as \code{date_var}
+#'   (e.g. \code{"YYYY-MM-DD"}). If \code{NULL} (default), the earliest date
+#'   in the data is used.
+#'
+#' @return The input data frame with one additional numeric column,
+#'   \code{perc_change}, giving each observation as a fractional change
+#'   relative to the group-specific baseline mean (0 = no change from
+#'   baseline, -1 = zero counts, positive values = above baseline).
+#'
+#' @examples
+#' \dontrun{
+#' dat_pct <- calc_percent_change(
+#'   dat                = mobility_data,
+#'   date_var           = "date",
+#'   grp_var            = "region",
+#'   count_var          = "trips",
+#'   n_baseline_periods = 7,
+#'   start_date         = "2020-01-13"
+#' )
+#' }
+#'
 #' @keywords pika
 #' @export
 # convert counts to % change -------------------------------------------------------------

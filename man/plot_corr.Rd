@@ -2,9 +2,7 @@
 % Please edit documentation in R/plot_functions.R
 \name{plot_corr}
 \alias{plot_corr}
-\title{This function plots the two time series and correlation over time
-There are optional arguments for confidence bands on x_var and customisation of the
-maximum value of the y-axis and labels for the facets of grp_var}
+\title{Plot time series and rolling correlation over time by group}
 \usage{
 plot_corr(
   dat,
@@ -22,35 +20,72 @@ plot_corr(
 )
 }
 \arguments{
-\item{dat}{data frame with columns that correspond to two time series and grouping variable(s)}
+\item{dat}{A data frame containing the two time series, a \code{roll_corr}
+column, a date column, and a grouping column.}
 
-\item{date_var}{character string of the column name that corresponds to the date variable
-date_var must be specified if subset_date is not null.}
+\item{date_var}{Character string giving the name of the date column (class
+\code{Date}).}
 
-\item{grp_var}{character string of column names in dat to be used as grouping variable(s)}
+\item{grp_var}{Character string giving the name of the grouping column used
+for faceting.}
 
-\item{x_var}{primary time series (should be a column in dat)}
+\item{x_var}{Character string giving the name of the primary time series column.}
 
-\item{y_var}{secondary time series (should be a column in dat)}
+\item{y_var}{Character string giving the name of the secondary time series column.}
 
-\item{x_var_lower}{column in dat corresponding to lower bound of confidence band for x_var}
+\item{x_var_lower}{Character string giving the name of the column containing
+the lower confidence bound for \code{x_var}. If \code{NULL} (default), no
+ribbon is drawn. Both \code{x_var_lower} and \code{x_var_upper} must be
+supplied to draw a ribbon.}
 
-\item{x_var_upper}{column in dat corresponding to upper bound of confidence band for x_var}
+\item{x_var_upper}{Character string giving the name of the column containing
+the upper confidence bound for \code{x_var}. If \code{NULL} (default), no
+ribbon is drawn.}
 
-\item{facet_labels}{vector of labels for facets (grp_var)}
+\item{facet_labels}{Named character vector of display labels for the facets,
+passed to \code{\link[ggplot2]{as_labeller}}. Names must match values in
+the grouping column. If \code{NULL} (default), raw group values are shown.}
 
-\item{legend_labels}{character vector of labels to use for plot legend}
+\item{legend_labels}{Character vector of length 3 giving legend labels for
+\code{roll_corr}, \code{x_var}, and \code{y_var} respectively. If
+\code{NULL} (default), column names are used.}
 
-\item{y_max}{maximum value of y-axis}
+\item{y_max}{Numeric. Maximum value for the y-axis. If supplied, the axis is
+set to \code{[-1, y_max]} and confidence bounds are clamped to this value.
+Default is \code{NULL} (auto-scaled).}
 
-\item{col_values}{vector of color values}
+\item{col_values}{Character vector of length 3 specifying line colours for
+\code{roll_corr}, \code{x_var}, and \code{y_var} respectively. Defaults to
+dark purple, mid-green, and dark blue from RColorBrewer palettes.}
 }
 \value{
-tibble of lags by grp_var
+A \code{\link[ggplot2]{ggplot}} object.
 }
 \description{
-This function plots the two time series and correlation over time
-There are optional arguments for confidence bands on x_var and customisation of the
-maximum value of the y-axis and labels for the facets of grp_var
+Produces a faceted line plot showing the primary series (\code{x_var}),
+secondary series (\code{y_var}), and rolling correlation (\code{roll_corr})
+over time, with one facet per group. Horizontal reference lines are drawn
+at y = -1, 0, and 1. Optionally adds a shaded confidence ribbon around
+\code{x_var}. The data frame must contain a column named \code{roll_corr}
+(e.g. from \code{\link{rolling_corr}}).
+}
+\examples{
+\dontrun{
+plot_corr(
+  dat           = data_corr,
+  date_var      = "date_end",
+  grp_var       = "province",
+  x_var         = "r_mean",
+  y_var         = "movement",
+  x_var_lower   = "r_q2.5",
+  x_var_upper   = "r_q97.5",
+  legend_labels = c("Rolling correlation", "Rt", "Mobility")
+)
+}
+
+}
+\seealso{
+\code{\link{rolling_corr}} to compute \code{roll_corr};
+  \code{\link{plot_lag}} to visualise the lag distribution.
 }
 \keyword{pika}

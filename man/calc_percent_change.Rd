@@ -2,7 +2,7 @@
 % Please edit documentation in R/analysis_functions.R
 \name{calc_percent_change}
 \alias{calc_percent_change}
-\title{Convert a count variable into percent change relative to baseline}
+\title{Convert a count time series to fractional change relative to a baseline period}
 \usage{
 calc_percent_change(
   dat,
@@ -14,26 +14,58 @@ calc_percent_change(
 )
 }
 \arguments{
-\item{dat}{data frame with columns that correspond to count variable and grouping variable}
+\item{dat}{A data frame containing a count column, a date column, and a
+grouping column.}
 
-\item{date_var}{character string of the name of the date column (should be of class "Date")}
+\item{date_var}{Character string giving the name of the date column (class
+\code{Date}). Default is \code{"date"}.}
 
-\item{grp_var}{character string of column name in dat to be used as grouping variable}
+\item{grp_var}{Character string giving the name of the grouping column. The
+baseline mean is computed separately per group.}
 
-\item{count_var}{character string of the name of the count column, such as number of trips}
+\item{count_var}{Character string giving the name of the count column.}
 
-\item{n_baseline_periods}{Number of periods to calculate baseline average over. For example,
-if the time series is days, n_baseline_periods = 7 for a baseline week.}
+\item{n_baseline_periods}{Integer. Number of consecutive time steps used to
+compute the baseline mean. For daily data, \code{7} gives a one-week
+baseline. Default is 7.}
 
-\item{start_date}{start date of baseline period (character string)}
+\item{start_date}{Start date of the baseline period. Accepts a \code{Date}
+object or a character string in the same format as \code{date_var}
+(e.g. \code{"YYYY-MM-DD"}). If \code{NULL} (default), the earliest date
+in the data is used.}
 }
 \value{
-data frame of with an additional column of the percent change relative to baseline
+The input data frame with one additional numeric column,
+  \code{perc_change}, giving each observation as a fractional change
+  relative to the group-specific baseline mean (0 = no change from
+  baseline, -1 = zero counts, positive values = above baseline).
 }
 \description{
-This function converts a count variable over time into a percent change based on the average
-value in the specified baseline period. This function was written for application to
-mobility data, where the percent change in mobility over time relative to baseline is of
-interest. However, this function can be applied to any count type time series.
+For each group, computes the mean of \code{count_var} over a baseline period
+of \code{n_baseline_periods} consecutive time steps starting at
+\code{start_date} (or the earliest date if \code{start_date} is \code{NULL}).
+Each observation is then expressed as a fractional change relative to that
+baseline mean:
+}
+\details{
+\deqn{\texttt{perc\_change} = \frac{\texttt{count} -
+  \texttt{baseline mean}}{\texttt{baseline mean}}}
+
+A value of 0 indicates no change from baseline; -0.5 indicates a 50\%
+decrease; 1.0 indicates a doubling. Originally developed for population
+mobility data but applicable to any non-negative count series.
+}
+\examples{
+\dontrun{
+dat_pct <- calc_percent_change(
+  dat                = mobility_data,
+  date_var           = "date",
+  grp_var            = "region",
+  count_var          = "trips",
+  n_baseline_periods = 7,
+  start_date         = "2020-01-13"
+)
+}
+
 }
 \keyword{pika}
