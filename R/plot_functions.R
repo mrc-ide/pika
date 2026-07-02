@@ -46,7 +46,7 @@ if(!is.null(x_var_lower) && !is.null(x_var_upper)){
 
   # convert data to long format ----------------------------------------------------------
   dat_long <- dat1 %>%
-    pivot_longer(-c(.data$date, .data$grp), names_to = "metric", values_to = "value") %>%
+    pivot_longer(-c("date", "grp"), names_to = "metric", values_to = "value") %>%
     filter(.data$metric %in% c("x_var","y_var", "roll_corr"))
 
 ### Plot correlation, Rt, and movement by region

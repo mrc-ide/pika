@@ -40,7 +40,7 @@ cross_corr <- function(dat, date_var = NULL, grp_var, x_var, y_var, max_lag = 20
   rhos <- dat %>%
     rename(x_var = {{x_var}}, y_var = {{y_var}}) %>% # rename x_var and y_var for ccf ---
     filter(!is.na(x_var), !is.na(y_var)) %>% # remove NA values -------------------------
-  tidyr::nest(gg = -c(grp_var)) %>%
+  tidyr::nest(gg = -tidyselect::all_of(grp_var)) %>%
     mutate(gg = purrr::map(.data$gg, function(x) stats::ccf(x$x_var, x$y_var, lag.max = max_lag)))
 
   # determine lags with max cross correlation -------------------------------------------
@@ -146,11 +146,11 @@ estimate_rt <- function(dat, grp_var, date_var, incidence_var, est_method = "par
       mutate(grp = r$grp[i],
              date_start = r$gg[[i]]$dates[.data$t_start],
              date_end = r$gg[[i]]$dates[.data$t_end]) %>%
-      rename(r_mean = .data$`Mean(R)`, r_q2.5 = .data$`Quantile.0.025(R)`,
-             r_q97.5 = .data$`Quantile.0.975(R)`,
-             r_median = .data$`Median(R)`) %>%
-      select(.data$date_start, .data$date_end, .data$grp, .data$r_mean, .data$r_q2.5,
-             .data$r_q97.5, .data$r_median)
+      rename(r_mean = "Mean(R)", r_q2.5 = "Quantile.0.025(R)",
+             r_q97.5 = "Quantile.0.975(R)",
+             r_median = "Median(R)") %>%
+      select("date_start", "date_end", "grp", "r_mean", "r_q2.5",
+             "r_q97.5", "r_median")
   }
 
   # bind rows to create single data frame -----------------------------------------------------
@@ -193,10 +193,10 @@ calc_percent_change <- function(dat, date_var = "date", grp_var, count_var,
 
   # check that start_date is a valid format ----------------------------------------------
   if(!is.null(start_date)){
-    start_date <- as.Date(start_date)
     if(!(start_date %in% dat[[date_var]])){
       stop("start_date does not match any dates in input dataset")
     }
+    start_date <- as.Date(start_date)
   }
 
   dat1 <- dat %>%
@@ -220,7 +220,7 @@ calc_percent_change <- function(dat, date_var = "date", grp_var, count_var,
   dat1a <- left_join(dat1, baseline, by = "grp")
   rtn <- dat1a %>%
     mutate(perc_change = .data$counts / .data$baseline_counts - 1) %>%
-    dplyr::select(-.data$baseline_counts)
+    dplyr::select(-"baseline_counts")
 
   # rename columns back to original column names ------------------------------------------
   name_index <- which(names(rtn) == "date"); names(rtn)[name_index] <- date_var
