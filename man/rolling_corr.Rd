@@ -11,7 +11,10 @@ rolling_corr(dat, date_var = "date", grp_var, x_var, y_var, n = 14)
 a grouping column.}
 
 \item{date_var}{Character string giving the name of the date column. Must be
-of class \code{Date}. Default is \code{"date"}.}
+of class \code{Date}. Default is \code{"date"}. Rows are sorted by
+\code{date_var} within each group before the rolling correlation is
+computed (required because \code{\link[TTR]{runCor}} assumes row order is
+chronological).}
 
 \item{grp_var}{Character string giving the name of the grouping column.
 Rolling correlation is computed separately within each group.}

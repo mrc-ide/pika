@@ -12,7 +12,11 @@
 #'
 #' @param dat A data frame containing the two time series and a grouping column.
 #' @param date_var Character string giving the name of the date column. Required
-#'   when \code{subset_date} is non-\code{NULL}.
+#'   when \code{subset_date} is non-\code{NULL}. When supplied, rows are sorted
+#'   by \code{date_var} within each group before the CCF is computed (required
+#'   because \code{\link[stats]{ccf}} assumes row order is chronological). If
+#'   \code{NULL}, \code{dat} must already be sorted chronologically within
+#'   each group.
 #' @param grp_var Character string giving the name of the grouping column. The
 #'   CCF is computed separately within each group.
 #' @param x_var Character string giving the name of the primary (leading) time
@@ -70,6 +74,11 @@ cross_corr <- function(dat, date_var = NULL, grp_var, x_var, y_var, max_lag = 20
     dat <- dat[ dat[, date_var] <= subset_date, ]
   }
 
+  # sort by date within group, since ccf() assumes row order = chronological order ------
+  if (!is.null(date_var)){
+    dat <- dat %>% arrange(.data[[grp_var]], .data[[date_var]])
+  }
+
   # calculate cross correlation for different lags --------------------------------------
   rhos <- dat %>%
     rename(x_var = {{x_var}}, y_var = {{y_var}}) %>% # rename x_var and y_var for ccf ---
@@ -87,7 +96,9 @@ cross_corr <- function(dat, date_var = NULL, grp_var, x_var, y_var, max_lag = 20
       cc = rhos$gg[[p]]$acf[,1,1]
     ) %>%
       filter(lags < 1) # restrict to lags less than 1 -----------------------------------
-    lags_max[p] <- df$lags[which(df$cc == max(df$cc))]
+    # which.max() always returns a single index; ties are broken by taking the first
+    # occurrence, i.e. the most negative lag achieving the max CCF -----------------------
+    lags_max[p] <- df$lags[which.max(df$cc)]
   }
   # create tibble of max lag by grp_var -------------------------------------------------
   lag_df <- tibble(
@@ -112,7 +123,10 @@ cross_corr <- function(dat, date_var = NULL, grp_var, x_var, y_var, max_lag = 20
 #' @param dat A data frame containing the two time series, a date column, and
 #'   a grouping column.
 #' @param date_var Character string giving the name of the date column. Must be
-#'   of class \code{Date}. Default is \code{"date"}.
+#'   of class \code{Date}. Default is \code{"date"}. Rows are sorted by
+#'   \code{date_var} within each group before the rolling correlation is
+#'   computed (required because \code{\link[TTR]{runCor}} assumes row order is
+#'   chronological).
 #' @param grp_var Character string giving the name of the grouping column.
 #'   Rolling correlation is computed separately within each group.
 #' @param x_var Character string giving the name of the primary time series column.
@@ -157,6 +171,8 @@ rolling_corr <- function(dat, date_var = "date", grp_var, x_var, y_var, n = 14){
     # rename column names to work inside runCor -------------------------------------------
     rename(x = {{x_var}}, y = {{y_var}}, grp = {{ grp_var }}, date = {{date_var}}) %>%
     filter(!is.na(.data$x), !is.na(.data$y)) %>%
+    # sort by date within group, since runCor() assumes row order = chronological order ---
+    arrange(.data$grp, .data$date) %>%
     group_by(.data$grp) %>%
     # determine rolling correlation between x and y ---------------------------------------
     mutate(roll_corr = TTR::runCor(.data$x, .data$y, n)) %>%

@@ -18,7 +18,11 @@ cross_corr(
 \item{dat}{A data frame containing the two time series and a grouping column.}
 
 \item{date_var}{Character string giving the name of the date column. Required
-when \code{subset_date} is non-\code{NULL}.}
+when \code{subset_date} is non-\code{NULL}. When supplied, rows are sorted
+by \code{date_var} within each group before the CCF is computed (required
+because \code{\link[stats]{ccf}} assumes row order is chronological). If
+\code{NULL}, \code{dat} must already be sorted chronologically within
+each group.}
 
 \item{grp_var}{Character string giving the name of the grouping column. The
 CCF is computed separately within each group.}
