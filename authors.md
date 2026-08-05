@@ -9,7 +9,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/mrc-ide/pika/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/mrc-ide/pika/blob/v0.3.0/DESCRIPTION)
 
 Ainslie K (2026). *pika: Evaluate Correlation Between Time Series*. R
 package version 0.3.0, <https://mrc-ide.github.io/pika/>.
