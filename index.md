@@ -130,6 +130,13 @@ pika includes example datasets for two case studies:
 
 ## Documentation
 
+For a quick tour of the core functions, see the getting-started guide:
+
+``` r
+
+vignette("pika", package = "pika")
+```
+
 For detailed usage examples and methodology, see the package’s
 case-study articles, each demonstrating the same lag-detection and
 rolling-correlation workflow on a different domain:

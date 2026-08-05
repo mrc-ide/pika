@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">pika</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -15,7 +15,7 @@
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/china-mobility-rt.html">Get started</a></li>
+      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/pika.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-case-studies" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Case studies</button>
@@ -36,6 +36,31 @@
       <small>Source: <a href="https://github.com/mrc-ide/pika/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.0" id="pika-030">pika 0.3.0<a class="anchor" aria-label="anchor" href="#pika-030"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-0-3-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-3-0"></a></h3>
+<ul><li>Fixed <code><a href="../reference/calc_percent_change.html">calc_percent_change()</a></code> to validate <code>start_date</code> format explicitly instead of relying on <code>%in%</code> coercion between a character string and a <code>Date</code> column, whose behavior changed between R 4.5 and R 4.6 and caused a CI test failure on R release</li>
+<li>Fixed <code><a href="../reference/calc_percent_change.html">calc_percent_change()</a></code> to qualify an unbound <code>counts</code> variable with <code>.data$</code> inside <code><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise()</a></code>
+</li>
+<li>Fixed the “Case study: reproduction number and mobility in China” vignette, which had <code>x_var</code>/<code>y_var</code> swapped in its <code><a href="../reference/cross_corr.html">cross_corr()</a></code> call and the date-shift direction reversed, so it silently returned a 0-day lag instead of reproducing the 4-day Hubei lag reported in Ainslie et al. (2020)</li>
+<li>Excluded <code>.claude/</code> from the built package via <code>.Rbuildignore</code>
+</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-features-0-3-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-3-0"></a></h3>
+<ul><li>Added <code>wastewater_data</code> and <code>covid_case_data</code>, weekly SARS-CoV-2 wastewater concentration and COVID-19 case counts for California, New York, and Ohio (2020-2023)</li>
+<li>Added a new vignette, “Case study: wastewater surveillance as a leading indicator for COVID-19 cases”, demonstrating <code><a href="../reference/cross_corr.html">cross_corr()</a></code>/<code><a href="../reference/rolling_corr.html">rolling_corr()</a></code> on real CDC NWSS and New York Times data, and testing whether wastewater’s lead time over clinical cases held up after at-home testing became widespread in 2022</li>
+<li>Renamed <code>pika_vignette.Rmd</code> to <code>china-mobility-rt.Rmd</code> and reorganized both vignettes as parallel case studies under a “Case studies” pkgdown menu</li>
+<li>Added a new “Get started” vignette (<code>pika.Rmd</code>) with a fast tour of every exported function, replacing the previous “Get started” navbar link that pointed straight at the China case study</li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-0-3-0">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-3-0"></a></h3>
+<ul><li>Declared <code>snakecase</code> as a <code>Suggests</code> dependency (used in the China vignette but previously undeclared, which broke vignette building)</li>
+<li>Added literature citations (Peccia et al. 2020, Li et al. 2022, Boehm et al. 2023) putting the wastewater case study’s findings in context with previously published results</li>
+<li>Added a Zenodo DOI badge and a license badge to the README</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0" id="pika-020">pika 0.2.0<a class="anchor" aria-label="anchor" href="#pika-020"></a></h2>
 <div class="section level3">
