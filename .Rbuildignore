@@ -1,5 +1,6 @@
 ^pika\.Rproj$
 ^\.Rproj\.user$
+^\.claude$
 ^LICENSE\.md$
 ^tests-script$
 ^\.travis\.yml$

@@ -1,4 +1,4 @@
-# pika <img src="inst/pika_hex.png" align="right" height="139" />
+# pika <img src="man/figures/logo.png" align="right" height="139" alt="pika hex logo" />
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/mrc-ide/pika/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mrc-ide/pika/actions/workflows/R-CMD-check.yaml)

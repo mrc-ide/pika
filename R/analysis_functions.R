@@ -377,7 +377,7 @@ calc_percent_change <- function(dat, date_var = "date", grp_var, count_var,
   baseline <- dat1 %>%
     filter(date %in% baseline_dates) %>%
     group_by(.data$grp) %>%
-    summarise(counts = mean(counts), .groups = "drop") %>%
+    summarise(counts = mean(.data$counts), .groups = "drop") %>%
     rename("baseline_counts" = "counts")
 
   # calculate percentage change in movement relative to baseline --------------------------
