@@ -22,7 +22,7 @@ navbar:
   components:
     intro:
       text: Get started
-      href: articles/china-mobility-rt.html
+      href: articles/pika.html
     articles:
       text: Case studies
       menu:

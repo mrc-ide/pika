@@ -1,0 +1,118 @@
+---
+title: "Get started with pika"
+author: "Kylie Ainslie"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Get started with pika}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+`pika` answers two questions about a pair of time series, optionally repeated across
+a grouping variable (e.g. region): at what lag are they most strongly correlated,
+and how does that correlation change over time? This page is a fast tour of the
+core functions on the data bundled with the package. For two full worked examples
+with real data and discussion, see the case studies:
+`vignette("china-mobility-rt")` and `vignette("wastewater-surveillance")`.
+
+## Installation
+
+```r
+# install.packages("remotes")
+remotes::install_github("mrc-ide/pika")
+```
+
+## Lag and rolling correlation
+`pika` bundles weekly SARS-CoV-2 wastewater concentration and COVID-19 case counts
+for three US states (`wastewater_data` and `covid_case_data`). Joining them gives a
+pair of time series per state.
+
+```{r setup_data, message=FALSE}
+library(dplyr)
+library(pika)
+
+data(wastewater_data)
+data(covid_case_data)
+
+dat <- inner_join(wastewater_data, covid_case_data, by = c("state", "date")) %>%
+  mutate(log_conc = log(conc), log_cases = log(cases + 1))
+```
+
+`cross_corr()` finds the lag (in rows of your data -- here, weeks) at which two
+variables are most strongly correlated, separately for each level of `grp_var`:
+
+```{r cross_corr}
+lags <- cross_corr(
+  dat = dat, date_var = "date", grp_var = "state",
+  x_var = "log_conc", y_var = "log_cases", max_lag = 8
+)
+lags
+```
+
+`rolling_corr()` then calculates the correlation between the two variables in a
+moving window, so you can see whether that relationship is stable over time rather
+than assuming a single lag/correlation applies throughout:
+
+```{r rolling_corr}
+dat_corr <- rolling_corr(
+  dat = dat, date_var = "date", grp_var = "state",
+  x_var = "log_conc", y_var = "log_cases", n = 12
+)
+tail(dat_corr, 3)
+```
+
+`plot_corr()` visualizes both series alongside the rolling correlation, faceted by
+group:
+
+```{r plot_corr, fig.width=8, fig.height=6, message=FALSE, warning=FALSE}
+plot_corr(
+  dat = dat_corr, date_var = "date", grp_var = "state",
+  x_var = "log_conc", y_var = "log_cases"
+)
+```
+
+`plot_lag()` plots a histogram of the lags returned by `cross_corr()` across
+groups, which is more useful with many groups than the three shown here:
+
+```{r plot_lag, fig.width=5, fig.height=3}
+plot_lag(dat = lags, lag_var = "lag")
+```
+
+## Other functions
+
+`calc_percent_change()` converts a count variable into percent change relative to
+the average value in a baseline period:
+
+```{r percent_change}
+pct <- calc_percent_change(
+  dat = wastewater_data, date_var = "date", grp_var = "state",
+  count_var = "conc", n_baseline_periods = 4
+)
+tail(pct, 3)
+```
+
+`estimate_rt()` wraps `EpiEstim::estimate_R()` to estimate the effective
+reproduction number (Rt) from case or death counts, by group:
+
+```{r estimate_rt, message=FALSE, warning=FALSE}
+data(china_case_data)
+rt <- estimate_rt(
+  dat = china_case_data, grp_var = "province",
+  date_var = "date", incidence_var = "cases"
+)
+tail(rt, 3)
+```
+
+## Learn more
+For a full worked example that estimates Rt and determines its lagged relationship
+with mobility, reproducing published results, see `vignette("china-mobility-rt")`.
+For an example that tests whether wastewater surveillance is a reliable leading
+indicator for clinical case counts, see `vignette("wastewater-surveillance")`.

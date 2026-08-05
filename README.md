@@ -2,6 +2,8 @@
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/mrc-ide/pika/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mrc-ide/pika/actions/workflows/R-CMD-check.yaml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3834293.svg)](https://doi.org/10.5281/zenodo.3834293)
 <!-- badges: end -->
 
 ## Overview
@@ -111,6 +113,11 @@ pika includes example datasets for two case studies:
 - **covid_case_data**: Weekly reported COVID-19 cases for the same three US states (Jan 2020 - Mar 2023)
 
 ## Documentation
+
+For a quick tour of the core functions, see the getting-started guide:
+```r
+vignette("pika", package = "pika")
+```
 
 For detailed usage examples and methodology, see the package's case-study articles,
 each demonstrating the same lag-detection and rolling-correlation workflow on a
