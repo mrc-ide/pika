@@ -34,12 +34,13 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="articles/pika_vignette.html">Get started</a></li>
+<li class="nav-item"><a class="nav-link" href="articles/china-mobility-rt.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/pika_vignette.html">pika: Evaluating Correlation Between Time Series</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-case-studies" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Case studies</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-case-studies">
+<li><a class="dropdown-item" href="articles/china-mobility-rt.html">Reproduction number and mobility in China</a></li>
+    <li><a class="dropdown-item" href="articles/wastewater-surveillance.html">Wastewater surveillance as a leading indicator</a></li>
   </ul>
 </li>
       </ul>
@@ -200,20 +201,25 @@
 <div class="section level2">
 <h2 id="included-data">Included Data<a class="anchor" aria-label="anchor" href="#included-data"></a>
 </h2>
-<p>pika includes example datasets from the COVID-19 pandemic in China:</p>
+<p>pika includes example datasets for two case studies:</p>
 <ul>
 <li>
-<strong>china_case_data</strong>: Daily confirmed COVID-19 cases by province (Jan 16 - Mar 24, 2020)</li>
+<strong>china_case_data</strong>: Daily confirmed COVID-19 cases by province in China (Jan 16 - Mar 24, 2020)</li>
 <li>
-<strong>exante_movement_data</strong>: Daily within-city movement index by province (Jan 1 - Mar 24, 2020)</li>
+<strong>exante_movement_data</strong>: Daily within-city movement index by province in China (Jan 1 - Mar 24, 2020)</li>
+<li>
+<strong>wastewater_data</strong>: Weekly SARS-CoV-2 wastewater concentration for California, New York, and Ohio (Apr 2020 - Mar 2023)</li>
+<li>
+<strong>covid_case_data</strong>: Weekly reported COVID-19 cases for the same three US states (Jan 2020 - Mar 2023)</li>
 </ul>
 </div>
 <div class="section level2">
 <h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
 </h2>
-<p>For detailed usage examples and methodology, see the package vignette:</p>
+<p>For detailed usage examples and methodology, see the package’s case-study articles, each demonstrating the same lag-detection and rolling-correlation workflow on a different domain:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/vignette.html" class="external-link">vignette</a></span><span class="op">(</span><span class="st">"pika_vignette"</span>, package <span class="op">=</span> <span class="st">"pika"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/vignette.html" class="external-link">vignette</a></span><span class="op">(</span><span class="st">"china-mobility-rt"</span>, package <span class="op">=</span> <span class="st">"pika"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/vignette.html" class="external-link">vignette</a></span><span class="op">(</span><span class="st">"wastewater-surveillance"</span>, package <span class="op">=</span> <span class="st">"pika"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>

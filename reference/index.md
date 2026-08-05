@@ -33,3 +33,7 @@ Example datasets included in the package
   : Daily confirmed cases of COVID-19 in China
 - [`exante_movement_data`](https://mrc-ide.github.io/pika/reference/exante_movement_data.md)
   : Daily within-city movement data for different regions in China
+- [`wastewater_data`](https://mrc-ide.github.io/pika/reference/wastewater_data.md)
+  : Weekly SARS-CoV-2 wastewater concentration for three US states
+- [`covid_case_data`](https://mrc-ide.github.io/pika/reference/covid_case_data.md)
+  : Weekly reported COVID-19 cases for three US states

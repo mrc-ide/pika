@@ -117,20 +117,27 @@ plot_corr(
 
 ## Included Data
 
-pika includes example datasets from the COVID-19 pandemic in China:
+pika includes example datasets for two case studies:
 
-- **china_case_data**: Daily confirmed COVID-19 cases by province (Jan
-  16 - Mar 24, 2020)
+- **china_case_data**: Daily confirmed COVID-19 cases by province in
+  China (Jan 16 - Mar 24, 2020)
 - **exante_movement_data**: Daily within-city movement index by province
-  (Jan 1 - Mar 24, 2020)
+  in China (Jan 1 - Mar 24, 2020)
+- **wastewater_data**: Weekly SARS-CoV-2 wastewater concentration for
+  California, New York, and Ohio (Apr 2020 - Mar 2023)
+- **covid_case_data**: Weekly reported COVID-19 cases for the same three
+  US states (Jan 2020 - Mar 2023)
 
 ## Documentation
 
-For detailed usage examples and methodology, see the package vignette:
+For detailed usage examples and methodology, see the package’s
+case-study articles, each demonstrating the same lag-detection and
+rolling-correlation workflow on a different domain:
 
 ``` r
 
-vignette("pika_vignette", package = "pika")
+vignette("china-mobility-rt", package = "pika")
+vignette("wastewater-surveillance", package = "pika")
 ```
 
 ## Citation

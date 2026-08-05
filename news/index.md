@@ -14,7 +14,11 @@
   [`rolling_corr()`](https://mrc-ide.github.io/pika/reference/rolling_corr.md)
   to use [`inherits()`](https://rdrr.io/r/base/class.html) instead of
   [`class()`](https://rdrr.io/r/base/class.html)
-- Replaced deprecated `summarise_at()` with modern `summarise()` in
+- Replaced deprecated
+  [`summarise_at()`](https://dplyr.tidyverse.org/reference/summarise_all.html)
+  with modern
+  [`summarise()`](https://dplyr.tidyverse.org/reference/summarise.html)
+  in
   [`calc_percent_change()`](https://mrc-ide.github.io/pika/reference/calc_percent_change.md)
 
 ### New features
