@@ -22,12 +22,14 @@ navbar:
   components:
     intro:
       text: Get started
-      href: articles/pika_vignette.html
+      href: articles/china-mobility-rt.html
     articles:
-      text: Articles
+      text: Case studies
       menu:
-        - text: "pika: Evaluating Correlation Between Time Series"
-          href: articles/pika_vignette.html
+        - text: "Reproduction number and mobility in China"
+          href: articles/china-mobility-rt.html
+        - text: "Wastewater surveillance as a leading indicator"
+          href: articles/wastewater-surveillance.html
 
 reference:
   - title: "Analysis Functions"
@@ -50,3 +52,5 @@ reference:
     contents:
       - china_case_data
       - exante_movement_data
+      - wastewater_data
+      - covid_case_data

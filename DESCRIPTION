@@ -21,7 +21,8 @@ Suggests:
     pkgdown,
     snakecase,
     testthat (>= 2.1.0)
-Depends: R (>= 3.0.0)
+Depends: 
+    R (>= 3.5)
 VignetteBuilder: knitr
 Imports:
     EpiEstim,
