@@ -24,8 +24,8 @@ A data frame with 672 rows and 3 variables:
 
 - province:
 
-  name of province/region in China where cases occured
+  name of province/region in China
 
 - movement:
 
-  daily population-weighted with-in city movement index
+  daily population-weighted within-city movement index

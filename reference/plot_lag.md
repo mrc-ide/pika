@@ -1,6 +1,8 @@
-# This function plots the lags by grp_var
+# Plot a histogram of optimal lags across groups
 
-This function plots the lags by grp_var
+Produces a histogram of the lag values returned by
+[`cross_corr`](https://mrc-ide.github.io/pika/reference/cross_corr.md),
+showing the distribution of optimal lags across groups.
 
 ## Usage
 
@@ -12,19 +14,39 @@ plot_lag(dat, lag_var, bins = 2)
 
 - dat:
 
-  data frame with columns that correspond to two time series and
-  grouping variable(s)
+  A data frame containing a lag column, typically the output of
+  [`cross_corr`](https://mrc-ide.github.io/pika/reference/cross_corr.md).
 
 - lag_var:
 
-  character string of the column name that corresponds to the date
-  variable
+  Character string giving the name of the lag column to plot.
 
 - bins:
 
-  character string of column names in dat to be used as grouping
-  variable(s)
+  Numeric. Bin width for the histogram. Default is 2.
 
 ## Value
 
-tibble of lags by grp_var
+A [`ggplot`](https://ggplot2.tidyverse.org/reference/ggplot.html)
+object.
+
+## See also
+
+[`cross_corr`](https://mrc-ide.github.io/pika/reference/cross_corr.md)
+to compute the lag values;
+[`plot_corr`](https://mrc-ide.github.io/pika/reference/plot_corr.md) to
+visualise the time series and rolling correlation.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+lags <- cross_corr(
+  dat     = my_data,
+  grp_var = "region",
+  x_var   = "r_mean",
+  y_var   = "movement"
+)
+plot_lag(lags, lag_var = "lag")
+} # }
+```

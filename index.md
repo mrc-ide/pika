@@ -1,4 +1,4 @@
-# pika ![](inst/pika_hex.png)
+# pika
 
 ## Overview
 
@@ -33,6 +33,7 @@ This package was developed as part of the research described in:
 You can install the development version of pika from GitHub:
 
 ``` r
+
 # install.packages("remotes")
 remotes::install_github("mrc-ide/pika")
 ```
@@ -43,6 +44,7 @@ To use `pika` within an `orderly` task, install from the drat
 repository:
 
 ``` r
+
 drat:::add("ncov-ic")
 install.packages("pika")
 ```
@@ -50,6 +52,7 @@ install.packages("pika")
 ## Quick Start
 
 ``` r
+
 library(pika)
 
 # Load example data
@@ -103,14 +106,14 @@ plot_corr(
 
 ## Functions
 
-| Function                                                                                   | Description                                                                     |
-|--------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
-| [`cross_corr()`](https://mrc-ide.github.io/pika/reference/cross_corr.md)                   | Determine the lag at which cross-correlation is highest between two time series |
-| [`rolling_corr()`](https://mrc-ide.github.io/pika/reference/rolling_corr.md)               | Calculate rolling (moving) correlation between two time series                  |
-| [`estimate_rt()`](https://mrc-ide.github.io/pika/reference/estimate_rt.md)                 | Estimate effective reproduction number (Rt) by group using EpiEstim             |
-| [`calc_percent_change()`](https://mrc-ide.github.io/pika/reference/calc_percent_change.md) | Convert counts to percent change relative to a baseline period                  |
-| [`plot_corr()`](https://mrc-ide.github.io/pika/reference/plot_corr.md)                     | Visualize time series and rolling correlation                                   |
-| [`plot_lag()`](https://mrc-ide.github.io/pika/reference/plot_lag.md)                       | Plot histogram of lags by group                                                 |
+| Function | Description |
+|----|----|
+| [`cross_corr()`](https://mrc-ide.github.io/pika/reference/cross_corr.md) | Determine the lag at which cross-correlation is highest between two time series |
+| [`rolling_corr()`](https://mrc-ide.github.io/pika/reference/rolling_corr.md) | Calculate rolling (moving) correlation between two time series |
+| [`estimate_rt()`](https://mrc-ide.github.io/pika/reference/estimate_rt.md) | Estimate effective reproduction number (Rt) by group using EpiEstim |
+| [`calc_percent_change()`](https://mrc-ide.github.io/pika/reference/calc_percent_change.md) | Convert counts to percent change relative to a baseline period |
+| [`plot_corr()`](https://mrc-ide.github.io/pika/reference/plot_corr.md) | Visualize time series and rolling correlation |
+| [`plot_lag()`](https://mrc-ide.github.io/pika/reference/plot_lag.md) | Plot histogram of lags by group |
 
 ## Included Data
 
@@ -126,6 +129,7 @@ pika includes example datasets from the COVID-19 pandemic in China:
 For detailed usage examples and methodology, see the package vignette:
 
 ``` r
+
 vignette("pika_vignette", package = "pika")
 ```
 

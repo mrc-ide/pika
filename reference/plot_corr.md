@@ -1,8 +1,13 @@
-# This function plots the two time series and correlation over time There are optional arguments for confidence bands on x_var and customisation of the maximum value of the y-axis and labels for the facets of grp_var
+# Plot time series and rolling correlation over time by group
 
-This function plots the two time series and correlation over time There
-are optional arguments for confidence bands on x_var and customisation
-of the maximum value of the y-axis and labels for the facets of grp_var
+Produces a faceted line plot showing the primary series (`x_var`),
+secondary series (`y_var`), and rolling correlation (`roll_corr`) over
+time, with one facet per group. Horizontal reference lines are drawn at
+y = -1 (dashed), 0 (solid), and 1 (dashed). Optionally adds a shaded
+confidence ribbon around `x_var`. If `dat` contains a column named
+`roll_corr` (e.g. from
+[`rolling_corr`](https://mrc-ide.github.io/pika/reference/rolling_corr.md))
+it will be included in the plot; if absent the line is simply omitted.
 
 ## Usage
 
@@ -27,53 +32,88 @@ plot_corr(
 
 - dat:
 
-  data frame with columns that correspond to two time series and
-  grouping variable(s)
+  A data frame containing the two time series, a `roll_corr` column, a
+  date column, and a grouping column.
 
 - date_var:
 
-  character string of the column name that corresponds to the date
-  variable date_var must be specified if subset_date is not null.
+  Character string giving the name of the date column (class `Date`).
 
 - grp_var:
 
-  character string of column names in dat to be used as grouping
-  variable(s)
+  Character string giving the name of the grouping column used for
+  faceting.
 
 - x_var:
 
-  primary time series (should be a column in dat)
+  Character string giving the name of the primary time series column.
 
 - y_var:
 
-  secondary time series (should be a column in dat)
+  Character string giving the name of the secondary time series column.
 
 - x_var_lower:
 
-  column in dat corresponding to lower bound of confidence band for
-  x_var
+  Character string giving the name of the column containing the lower
+  confidence bound for `x_var`. If `NULL` (default), no ribbon is drawn.
+  Both `x_var_lower` and `x_var_upper` must be supplied to draw a
+  ribbon.
 
 - x_var_upper:
 
-  column in dat corresponding to upper bound of confidence band for
-  x_var
+  Character string giving the name of the column containing the upper
+  confidence bound for `x_var`. If `NULL` (default), no ribbon is drawn.
 
 - facet_labels:
 
-  vector of labels for facets (grp_var)
+  Named character vector of display labels for the facets, passed to
+  [`as_labeller`](https://ggplot2.tidyverse.org/reference/as_labeller.html).
+  Names must match values in the grouping column. If `NULL` (default),
+  raw group values are shown.
 
 - legend_labels:
 
-  character vector of labels to use for plot legend
+  Character vector of length 3 giving legend labels for `roll_corr`,
+  `x_var`, and `y_var` respectively. If `NULL` (default), the internal
+  metric names (`roll_corr`, `x_var`, `y_var`) are shown in the legend.
 
 - y_max:
 
-  maximum value of y-axis
+  Numeric. Maximum value for the y-axis. If supplied, the axis is set to
+  `[-1, y_max]` and confidence bounds are clamped to this value. Default
+  is `NULL` (auto-scaled).
 
 - col_values:
 
-  vector of color values
+  Character vector of length 3 specifying line colours for `roll_corr`,
+  `x_var`, and `y_var` respectively. Defaults to dark purple, mid-green,
+  and dark blue from RColorBrewer palettes.
 
 ## Value
 
-tibble of lags by grp_var
+A [`ggplot`](https://ggplot2.tidyverse.org/reference/ggplot.html)
+object.
+
+## See also
+
+[`rolling_corr`](https://mrc-ide.github.io/pika/reference/rolling_corr.md)
+to compute `roll_corr`;
+[`plot_lag`](https://mrc-ide.github.io/pika/reference/plot_lag.md) to
+visualise the lag distribution.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+plot_corr(
+  dat           = data_corr,
+  date_var      = "date_end",
+  grp_var       = "province",
+  x_var         = "r_mean",
+  y_var         = "movement",
+  x_var_lower   = "r_q2.5",
+  x_var_upper   = "r_q97.5",
+  legend_labels = c("Rolling correlation", "Rt", "Mobility")
+)
+} # }
+```

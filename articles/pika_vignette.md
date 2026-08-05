@@ -79,6 +79,7 @@ specified as character strings in the `grp_var =`, `date_var =`, and
 `incidence_var =` arguments.
 
 ``` r
+
 # to estimate them with pika, use estimate_rt() ------------------------------------------
 rt_estimates <- estimate_rt(dat = china_case_data,
                             grp_var = "province",
@@ -128,6 +129,7 @@ into a single data frame. We do this below using `dplyr`’s `left_join()`
 by `date` and `province`.
 
 ``` r
+
 # Join data sets together by date and province to determine cross correlation -----------
 # for this we are using input rt estimates, not those estimated using pika::estimate_rt()
 data_joined <- left_join(rt_estimates,
@@ -158,6 +160,7 @@ cross correlation between the two time series for a subset of the time
 window.
 
 ``` r
+
 # # Determine lag with max cross correlation between Rt and movement ----------------------
 lags <- cross_corr(dat = data_joined,
                    date_var = "date",
@@ -176,6 +179,7 @@ Once the optimal lag is determined, we must back date our Rt estimates
 without impacting the date of the movement variable.
 
 ``` r
+
 # create lag date using max lag from cross_corr() ---------------------------------------
 data_joined_lag <- rt_estimates %>%
   mutate(date = date + my_lag) %>%
@@ -195,6 +199,7 @@ in mobility over time relative to baseline is of interest. However, this
 function can be applied to any count type time series.
 
 ``` r
+
 perc_change_data <- calc_percent_change(dat = exante_movement_data,
                                         date_var = "date",
                                         grp_var = "province", 
@@ -204,16 +209,16 @@ perc_change_data <- calc_percent_change(dat = exante_movement_data,
 
 | date       | province | movement | perc_change |
 |:-----------|:---------|---------:|------------:|
-| 2020-01-01 | anhui    | 5.131897 |   0.9674739 |
-| 2020-01-02 | anhui    | 5.585968 |   1.0530762 |
-| 2020-01-03 | anhui    | 5.675878 |   1.0700261 |
-| 2020-01-04 | anhui    | 5.191629 |   0.9787347 |
-| 2020-01-05 | anhui    | 4.821942 |   0.9090406 |
-| 2020-01-06 | anhui    | 5.421992 |   1.0221631 |
-| 2020-01-07 | anhui    | 5.301700 |   0.9994855 |
-| 2020-01-08 | anhui    | 5.636145 |   1.0625356 |
-| 2020-01-09 | anhui    | 5.463023 |   1.0298983 |
-| 2020-01-10 | anhui    | 5.633986 |   1.0621285 |
+| 2020-01-01 | anhui    | 5.131897 |  -0.0325261 |
+| 2020-01-02 | anhui    | 5.585968 |   0.0530762 |
+| 2020-01-03 | anhui    | 5.675878 |   0.0700261 |
+| 2020-01-04 | anhui    | 5.191629 |  -0.0212653 |
+| 2020-01-05 | anhui    | 4.821942 |  -0.0909594 |
+| 2020-01-06 | anhui    | 5.421992 |   0.0221631 |
+| 2020-01-07 | anhui    | 5.301700 |  -0.0005145 |
+| 2020-01-08 | anhui    | 5.636145 |   0.0625356 |
+| 2020-01-09 | anhui    | 5.463023 |   0.0298983 |
+| 2020-01-10 | anhui    | 5.633986 |   0.0621285 |
 
 ## Rolling correlation
 
@@ -232,6 +237,7 @@ called “rolling_corr”. Depending on the value of `n`, the first `n`
 values of “rolling_corr” are NA.
 
 ``` r
+
 # Determine rolling correlation between Rt and movement ---------------------------------
 data_corr <- rolling_corr(dat = data_joined_lag,
                           date_var = "date",
@@ -256,6 +262,7 @@ them. We also specify custom facet and legend labels and restrict the
 y-axis to a maximum value of 10.
 
 ``` r
+
 # Plot Rt, movement, and correlation ----------------------------------------------------
 my_labels <- c("beijing" = "Beijing", "guangdong" = "Guangdong", "henan" = "Henan",
                "hong_kong_sar" = "Hong Kong SAR", "hubei" = "Hubei", "hunan" = "Hunan",

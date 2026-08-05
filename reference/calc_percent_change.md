@@ -1,10 +1,9 @@
-# Convert a count variable into percent change relative to baseline
+# Convert a count time series to fractional change relative to a baseline period
 
-This function converts a count variable over time into a percent change
-based on the average value in the specified baseline period. This
-function was written for application to mobility data, where the percent
-change in mobility over time relative to baseline is of interest.
-However, this function can be applied to any count type time series.
+For each group, computes the mean of `count_var` over a baseline period
+of `n_baseline_periods` consecutive time steps starting at `start_date`
+(or the earliest date if `start_date` is `NULL`). Each observation is
+then expressed as a fractional change relative to that baseline mean:
 
 ## Usage
 
@@ -23,33 +22,62 @@ calc_percent_change(
 
 - dat:
 
-  data frame with columns that correspond to count variable and grouping
-  variable
+  A data frame containing a count column, a date column, and a grouping
+  column.
 
 - date_var:
 
-  character string of the name of the date column (should be of class
-  "Date")
+  Character string giving the name of the date column (class `Date`).
+  Default is `"date"`.
 
 - grp_var:
 
-  character string of column name in dat to be used as grouping variable
+  Character string giving the name of the grouping column. The baseline
+  mean is computed separately per group.
 
 - count_var:
 
-  character string of the name of the count column, such as number of
-  trips
+  Character string giving the name of the count column.
 
 - n_baseline_periods:
 
-  Number of periods to calculate baseline average over. For example, if
-  the time series is days, n_baseline_periods = 7 for a baseline week.
+  Integer. Number of consecutive time steps used to compute the baseline
+  mean. For daily data, `7` gives a one-week baseline. Default is 7.
 
 - start_date:
 
-  start date of baseline period (character string)
+  Start date of the baseline period. Accepts a `Date` object or a
+  character string in `"YYYY-MM-DD"` format (e.g. `"2020-01-13"`). If
+  `NULL` (default), the earliest date across the combined dataset is
+  used as the baseline start.
 
 ## Value
 
-data frame of with an additional column of the percent change relative
-to baseline
+The input data frame with one additional numeric column, `perc_change`,
+giving each observation as a fractional change relative to the
+group-specific baseline mean (0 = no change from baseline, -1 = zero
+counts, positive values = above baseline).
+
+## Details
+
+\$\$\texttt{perc\\change} = \frac{\texttt{count} - \texttt{baseline
+mean}}{\texttt{baseline mean}}\$\$
+
+A value of 0 indicates no change from baseline; -0.5 indicates a 50%
+decrease; 1.0 indicates a doubling. Originally developed for population
+mobility data but applicable to any non-negative count series.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+dat_pct <- calc_percent_change(
+  dat                = mobility_data,
+  date_var           = "date",
+  grp_var            = "region",
+  count_var          = "trips",
+  n_baseline_periods = 7,
+  start_date         = "2020-01-13"
+)
+} # }
+```

@@ -7,14 +7,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>pika - Evaluate Correlation Between Time Series • pika</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="pika - Evaluate Correlation Between Time Series">
 <meta name="description" content="A lightweight R package for evaluating correlation between time series, developed for epidemiological applications at the MRC Centre for Global Infectious Disease Analysis.
 ">
 <meta property="og:description" content="A lightweight R package for evaluating correlation between time series, developed for epidemiological applications at the MRC Centre for Global Infectious Disease Analysis.
 ">
+<meta property="og:image" content="https://mrc-ide.github.io/pika/logo.png">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -55,8 +56,10 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="pika-">pika <img src="inst/pika_hex.png" align="right" height="139"><a class="anchor" aria-label="anchor" href="#pika-"></a>
-</h1></div>
+<div class="page-header">
+<img src="logo.png" class="logo" alt=""><h1 id="pika-">pika <a class="anchor" aria-label="anchor" href="#pika-"></a>
+</h1>
+</div>
 <!-- badges: start -->
 
 <div class="section level2">
@@ -162,32 +165,32 @@
 <col width="43%">
 <col width="56%">
 </colgroup>
-<thead><tr class="header">
+<thead><tr>
 <th>Function</th>
 <th>Description</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><code><a href="reference/cross_corr.html">cross_corr()</a></code></td>
 <td>Determine the lag at which cross-correlation is highest between two time series</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code><a href="reference/rolling_corr.html">rolling_corr()</a></code></td>
 <td>Calculate rolling (moving) correlation between two time series</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code><a href="reference/estimate_rt.html">estimate_rt()</a></code></td>
 <td>Estimate effective reproduction number (Rt) by group using EpiEstim</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code><a href="reference/calc_percent_change.html">calc_percent_change()</a></code></td>
 <td>Convert counts to percent change relative to a baseline period</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code><a href="reference/plot_corr.html">plot_corr()</a></code></td>
 <td>Visualize time series and rolling correlation</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code><a href="reference/plot_lag.html">plot_lag()</a></code></td>
 <td>Plot histogram of lags by group</td>
 </tr>
@@ -280,7 +283,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>
