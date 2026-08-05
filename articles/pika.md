@@ -100,11 +100,15 @@ plot_corr(
 plots a histogram of the lags returned by
 [`cross_corr()`](https://mrc-ide.github.io/pika/reference/cross_corr.md)
 across groups, which is more useful with many groups than the three
-shown here:
+shown here. Note that `bins` is passed directly to
+[`ggplot2::geom_histogram()`](https://ggplot2.tidyverse.org/reference/geom_histogram.html)’s
+`binwidth`, not a bin *count* – with only a couple of lag values
+spanning a narrow range, as here, the default `bins = 2` bins everything
+into a single bar spanning the whole plot, so we use a narrower value:
 
 ``` r
 
-plot_lag(dat = lags, lag_var = "lag")
+plot_lag(dat = lags, lag_var = "lag", bins = 1)
 ```
 
 ![](pika_files/figure-html/plot_lag-1.png)
