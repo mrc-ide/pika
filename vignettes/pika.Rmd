@@ -80,10 +80,14 @@ plot_corr(
 ```
 
 `plot_lag()` plots a histogram of the lags returned by `cross_corr()` across
-groups, which is more useful with many groups than the three shown here:
+groups, which is more useful with many groups than the three shown here. Note that
+`bins` is passed directly to `ggplot2::geom_histogram()`'s `binwidth`, not a bin
+*count* -- with only a couple of lag values spanning a narrow range, as here, the
+default `bins = 2` bins everything into a single bar spanning the whole plot, so we
+use a narrower value:
 
 ```{r plot_lag, fig.width=5, fig.height=3}
-plot_lag(dat = lags, lag_var = "lag")
+plot_lag(dat = lags, lag_var = "lag", bins = 1)
 ```
 
 ## Other functions
