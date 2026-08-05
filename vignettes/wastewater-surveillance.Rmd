@@ -28,7 +28,8 @@ and did that lead time and the strength of the relationship hold up once clinica
 case counts became a less reliable measure of true infections** (most notably after
 at-home rapid antigen tests became widely available in the US in early 2022, after
 which a growing share of infections were never reported to public health
-authorities)?
+authorities, and a specific wastewater concentration came to correspond to
+substantially fewer reported cases than it had previously [@Boehm2023])?
 
 This case study demonstrates the same lag-detection and rolling-correlation
 workflow as `vignette("china-mobility-rt")`, applied to real, public health
@@ -114,13 +115,26 @@ kable(lags)
 ```
 
 Wastewater leads cases by one to two weeks in California and Ohio, and is roughly
-contemporaneous with cases in New York -- consistent with the days-to-weeks lead
-times reported elsewhere in the wastewater surveillance literature. To align the two
+contemporaneous with cases in New York. These sit toward the shorter end of, but
+within, the range reported elsewhere: Peccia et al. (2020) found wastewater led
+same-day case reports by 0-2 days and led cases by their (later) reporting date by
+6-8 days in New Haven, Connecticut, and a systematic review of 133 reported
+wastewater-case correlations across many studies found lead times of 2-24 days,
+with correlation coefficients from -0.38 to 0.99 [@Peccia2020; @Li2022] -- both our
+lag estimates and the (state-level, log-log) correlation strengths we find later
+fall within that broad published range, even though the specific catchments,
+populations, and time periods differ from ours in ways that make an exact match
+unlikely. To align the two
 series on this optimal lag, we shift each state's wastewater dates forward by
 `-lag` weeks (i.e. `lag` rows, converted to days since our data is weekly).
 **The lag returned by `cross_corr()` is in units of rows of the input data, not
 necessarily days or weeks -- always check the spacing of your own data before
-converting.**
+converting.** This also means `cross_corr()` implicitly assumes every row is evenly
+spaced in time: California's series is missing one week early on (during the period
+when only a single site was reporting), so one pair of consecutive rows there is 14
+days apart rather than 7. With one such gap out of roughly 150 weeks, the effect on
+the estimated lag is negligible, but it is a real assumption worth checking in your
+own data before trusting the returned lag.
 
 ```{r lag_var}
 data_lagged <- data_joined %>%
@@ -194,6 +208,33 @@ occasional weeks of weak or negative correlation in both periods, most likely
 reflecting genuine week-to-week volatility in a 12-week window (holiday reporting
 effects, changes in which sites reported that week) rather than a sustained
 regime change.
+
+This does not contradict the published evidence that case ascertainment declined --
+it is answering a different question. Boehm et al. (2023) [@Boehm2023] directly
+studied three California wastewater treatment plants before and after 1 May 2022
+and found a genuine divergence: a specific wastewater concentration corresponded to
+a significantly lower reported case incidence after that date than before (the
+*intercept* of a power-law relationship between the two shifted; for example, at
+one plant it fell from 0.29 to -0.66). Critically, they reported that the *slope*
+of that relationship -- how the two series move together -- did not differ
+significantly between the two periods at two of their three sites. That is
+consistent with, not contrary to, what we find here: reported cases can become
+systematically depressed in absolute level relative to true infections (an
+ascertainment problem, which is what Boehm et al. measured) while remaining a
+reasonably proportional, still-correlated signal of relative week-to-week trends
+(which is what `rolling_corr()` measures here). Our result is a state-level,
+lower-resolution echo of theirs, not an independent replication -- we have not
+tested for an intercept shift the way they did.
+
+One general caveat applies to this whole analysis: wastewater concentration and
+case counts are both smooth, wave-shaped epidemic curves, and any two series that
+share a similar wave shape will show substantial correlation even without a genuine
+leading-indicator relationship between them. Lagged and rolling correlation reduce
+this risk relative to a single contemporaneous correlation, but do not eliminate
+it -- a shared "big wave, then a smaller wave" shape can inflate the correlation
+within a 12-week window regardless of the true lead time. This is a standard
+limitation of correlation-based lag detection on epidemic time series generally,
+not something specific to this dataset.
 
 This is a useful result precisely because it complicates the tidy assumption: at
 the *state* level, aggregating across many counties and sewersheds, reported case
